@@ -17,7 +17,7 @@ export default function Signup() {
 ): Promise<boolean> => {
   try {
     const res = await fetch(
-      "https://mind-ease-6auw.onrender.com/user/signup",
+      "/user/signup",
       {
         method: "POST",
         headers: {
