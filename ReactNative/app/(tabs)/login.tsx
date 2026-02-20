@@ -8,14 +8,14 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  
+  const BaseUrl = "https://mindeasebackend-production.up.railway.app"
 
   const checkLogin = async (
   email: string,
   password: string
 ): Promise<boolean> => {
   try {
-    const res = await fetch("/user/login", {
+    const res = await fetch(`${BaseUrl}/user/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

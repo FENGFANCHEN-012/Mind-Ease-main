@@ -8,8 +8,8 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
-
-
+  const BaseUrl = "https://mindeasebackend-production.up.railway.app"
+   
    const submitData = async (
   username: string,
   password: string,
@@ -17,7 +17,7 @@ export default function Signup() {
 ): Promise<boolean> => {
   try {
     const res = await fetch(
-      "/user/signup",
+      `${BaseUrl}/user/signup`,
       {
         method: "POST",
         headers: {
