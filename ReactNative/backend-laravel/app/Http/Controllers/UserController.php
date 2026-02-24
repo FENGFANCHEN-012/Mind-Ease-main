@@ -49,3 +49,13 @@ class UserController extends Controller
         ], 401);
     }
 }
+
+
+class ProfileController extends Controller
+{
+    public function show($id)
+    {
+        $user = User::findOrFail($id);
+        return response()->json($user);
+    }
+}

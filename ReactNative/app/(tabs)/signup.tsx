@@ -39,7 +39,7 @@ export default function Signup() {
     }
 
     return true;
-  } catch (err) {
+  } catch (error) {
     setError("Network error");
     return false;
   }
@@ -60,7 +60,12 @@ export default function Signup() {
     }
     submitData(username,password,email);
     // After successful signup, redirect to login
+    if(submitData!){
+      setError("Network Issue, Please check your network and try again")
+    }
+    else{
     router.replace("/(tabs)/login");
+    }
   };
 
 
