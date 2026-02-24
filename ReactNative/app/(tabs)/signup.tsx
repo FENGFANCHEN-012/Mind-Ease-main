@@ -45,8 +45,14 @@ export default function Signup() {
   }
 };
 
+   const validateEmail = (email: string) => {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
+};
 
-   const handleSignup = () => {
+
+
+   const handleSignup = async () => {
     setError("");
 
     if (!username.trim() || !password.trim() || !confirmPassword.trim()) {
@@ -58,9 +64,19 @@ export default function Signup() {
       setError("Passwords do not match.");
       return;
     }
-    submitData(username,password,email);
+    if (!validateEmail(email)) {
+  setError("Please enter a valid email address.");
+  return;
+}
+if (password.length < 6) {
+  setError("Password must be at least 6 characters long.");
+  return;
+}
+    
+    const success = await submitData(username,password,email);
+   
     // After successful signup, redirect to login
-    if(submitData!){
+    if(!success){
       setError("Network Issue, Please check your network and try again")
     }
     else{
