@@ -8,8 +8,7 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
-  const BaseUrl = "https://mindeasebackend-production.up.railway.app"
-   
+  const BaseUrl = "https://mindeasebackend-production.up.railway.app/api"
    const submitData = async (
   username: string,
   password: string,
