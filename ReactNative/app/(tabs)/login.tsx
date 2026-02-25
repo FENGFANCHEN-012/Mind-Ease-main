@@ -8,7 +8,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const BaseUrl = "https://mindeasebackend-production.up.railway.app"
+  const BaseUrl = "https://mindeasebackend-production.up.railway.app/api"
 
   const checkLogin = async (
   email: string,
