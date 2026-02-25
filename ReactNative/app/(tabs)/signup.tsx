@@ -9,38 +9,49 @@ export default function Signup() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const BaseUrl = "https://mindeasebackend-production.up.railway.app/api"
-   const submitData = async (
+const submitData = async (
   username: string,
   password: string,
   email: string
 ): Promise<boolean> => {
   try {
-    const res = await fetch(
-      `${BaseUrl}/user/signup`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+    const res = await fetch(`${BaseUrl}/user/signup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      // ✅ 关键：Laravel 现在要 name，不要 username
+      body: JSON.stringify({
+        name: username,
+        password,
+        email,
+      }),
+    });
 
-          name: username,
-          password,
-          email,
-        }),
-      }
-    );
+    const raw = await res.text(); // 先读文本，避免 json 解析炸掉
+    console.log("SIGNUP status:", res.status);
+    console.log("SIGNUP raw:", raw);
 
-    const data = await res.json();
+    let data: any = {};
+    try {
+      data = JSON.parse(raw);
+    } catch {}
 
     if (!res.ok) {
-      setError(data.error || "Signup failed");
+      
+      const msg =
+        data?.message ||
+        data?.error ||
+        (data?.errors ? JSON.stringify(data.errors) : "Signup failed");
+      setError(msg);
       return false;
     }
 
     return true;
-  } catch (error) {
-    setError("Network error");
+  } catch (e: any) {
+    console.log("SIGNUP fetch error:", e?.message || e);
+    setError(e?.message || "Network error");
     return false;
   }
 };
@@ -76,9 +87,7 @@ if (password.length < 6) {
     const success = await submitData(username,password,email);
    
     // After successful signup, redirect to login
-    if(!success){
-      setError("Network Issue, Please check your network and try again")
-    }
+    if(!success) return;
     else{
     router.replace("/(tabs)/login");
     }
