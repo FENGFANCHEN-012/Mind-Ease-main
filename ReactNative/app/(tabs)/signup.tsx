@@ -51,7 +51,8 @@ const submitData = async (
 
     return true;
   } catch (e: any) {
-    console.log("SIGNUP fetch error:", e?.message || e);
+    
+       console.log("SIGNUP fetch error:", e); 
     setError(e?.message || "Network error");
     return false;
   }
