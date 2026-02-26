@@ -22,7 +22,7 @@ const submitData = async (
         "Content-Type": "application/json",
         Accept: "application/json",
       },
-      // ✅ 关键：Laravel 现在要 name，不要 username
+     
       body: JSON.stringify({
         name: username,
         password,
@@ -30,7 +30,7 @@ const submitData = async (
       }),
     });
 
-    const raw = await res.text(); // 先读文本，避免 json 解析炸掉
+    const raw = await res.text(); 
     console.log("SIGNUP status:", res.status);
     console.log("SIGNUP raw:", raw);
 
