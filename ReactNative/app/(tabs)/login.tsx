@@ -15,7 +15,7 @@ export default function Login() {
   password: string
 ): Promise<boolean> => {
   try {
-    const res = await fetch(`${BaseUrl}/user/login`, {
+    const res = await fetch(`${BaseUrl}/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -28,13 +28,13 @@ export default function Login() {
       const data = await res.json();
       console.log("Login successful:", data);
       const {token} = data;
-      if (!token) {
+      if (token) {
+        await SecureStore.setItemAsync("authToken", token);
+        return true;
+      }
+
       console.error("No token returned");
-      await SecureStore.setItemAsync("authToken", token);
-
-
       return false;
-    }
 
       return true;
     } else {
