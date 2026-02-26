@@ -1,7 +1,7 @@
-import { View, Text, TextInput, Pressable, Image } from "react-native";
-import { useState } from "react";
 import { router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
+import { useState } from "react";
+import { Pressable, Text, TextInput, View } from "react-native";
 
 
 export default function Login() {
@@ -35,10 +35,7 @@ export default function Login() {
 
       console.error("No token returned");
       return false;
-
-      return true;
     } else {
-      const errorData = await res.json();
       console.error("Login failed:", errorData);
       return false;
     }
