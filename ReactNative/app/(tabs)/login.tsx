@@ -1,7 +1,7 @@
 import { router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Alert, Pressable, Text, TextInput, View } from "react-native";
 
 
 export default function Login() {
@@ -36,6 +36,7 @@ export default function Login() {
       console.error("No token returned");
       return false;
     } else {
+      const errorData = await res.json();
       console.error("Login failed:", errorData);
       return false;
     }
@@ -55,7 +56,16 @@ export default function Login() {
 
     const isLoginSuccessful = await checkLogin(email, password);
     if (isLoginSuccessful) {
-      router.replace("/(tabs)/homepage");
+      Alert.alert(
+        "Login successful",
+        "Welcome back!",
+        [
+          {
+            text: "OK",
+            onPress: () => router.replace("/(tabs)/homepage"),
+          },
+        ]
+      );
     } else {
       setError("Invalid email or password.");
     }

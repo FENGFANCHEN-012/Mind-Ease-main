@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Alert, Pressable, Text, TextInput, View } from "react-native";
 
 export default function Signup() {
   const [email,setEmail] = useState("");
@@ -8,7 +8,6 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
-  const [isSuccess, setIsSuccess] = useState(false);
   const BaseUrl = "https://mindeasebackend-production.up.railway.app/api"
   
 const submitData = async (
@@ -91,48 +90,21 @@ if (password.length < 6) {
    
     // After successful signup, redirect to login
     if(!success) return;
-    setIsSuccess(true);
+    Alert.alert(
+      "Signup successful",
+      "Your account has been created. You can log in now.",
+      [
+        {
+          text: "OK",
+          onPress: () => router.replace("/login"),
+        },
+      ]
+    );
   };
 
 
 
   return (
-    isSuccess ? (
-    <View style={{ flex: 1, padding: 24, backgroundColor: "#fff", justifyContent: "center" }}>
-      <View style={{ alignItems: "center" }}>
-        <View
-          style={{
-            width: 72,
-            height: 72,
-            borderRadius: 16,
-            backgroundColor: "#2DBE60",
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: 16,
-          }}
-        >
-          <Text style={{ color: "#fff", fontSize: 32, fontWeight: "bold" }}>✓</Text>
-        </View>
-        <Text style={{ fontSize: 22, fontWeight: "700", marginBottom: 8 }}>Account created</Text>
-        <Text style={{ color: "#666", textAlign: "center", marginBottom: 24 }}>
-          Your signup was successful. You can log in now.
-        </Text>
-
-        <Pressable
-          onPress={() => router.replace("/(tabs)/login")}
-          style={{
-            backgroundColor: "#2DBE60",
-            paddingVertical: 14,
-            borderRadius: 8,
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          <Text style={{ color: "#fff", fontWeight: "600", fontSize: 16 }}>Go to Login</Text>
-        </Pressable>
-      </View>
-    </View>
-  ) : (
     <View style={{ flex: 1, padding: 24, backgroundColor: "#fff" }}>
       {/* Logo + Title */}
       <View style={{ alignItems: "center", marginTop: 40 }}>
@@ -260,6 +232,5 @@ if (password.length < 6) {
         </Pressable>
       </View>
     </View>
-    )
   );
 }
