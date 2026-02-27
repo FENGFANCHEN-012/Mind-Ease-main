@@ -1,6 +1,14 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { Alert, Pressable, Text, TextInput, View } from "react-native";
+import {
+    ActivityIndicator,
+    Alert,
+    Pressable,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
+} from "react-native";
 
 export default function Signup() {
   const [email,setEmail] = useState("");
@@ -8,6 +16,7 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const BaseUrl = "https://mindeasebackend-production.up.railway.app/api"
   
 const submitData = async (
@@ -68,6 +77,8 @@ const submitData = async (
    const handleSignup = async () => {
     setError("");
 
+    if (isSubmitting) return;
+
     if (!username.trim() || !password.trim() || !confirmPassword.trim()) {
       setError("Please ensure all fields are filled.");
       return;
@@ -86,140 +97,106 @@ if (password.length < 6) {
   return;
 }
     
-    const success = await submitData(username,password,email);
+    setIsSubmitting(true);
+    try {
+      const success = await submitData(username,password,email);
    
     // After successful signup, redirect to login
-    if(!success) return;
-    Alert.alert(
-      "Signup successful",
-      "Your account has been created. You can log in now.",
-      [
-        {
-          text: "OK",
-          onPress: () => router.replace("/login"),
-        },
-      ]
-    );
+      if(!success) return;
+      Alert.alert(
+        "Signup successful",
+        "Your account has been created. You can log in now.",
+        [
+          {
+            text: "OK",
+            onPress: () => router.replace("/login"),
+          },
+        ]
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
 
 
   return (
-    <View style={{ flex: 1, padding: 24, backgroundColor: "#fff" }}>
+    <View style={styles.container}>
       {/* Logo + Title */}
-      <View style={{ alignItems: "center", marginTop: 40 }}>
-        <View
-          style={{
-            width: 60,
-            height: 60,
-            borderRadius: 12,
-            backgroundColor: "#2DBE60",
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: 12,
-          }}
-        >
-          <Text style={{ color: "#fff", fontSize: 28, fontWeight: "bold" }}>
-            M
-          </Text>
+      <View style={styles.header}>
+        <View style={styles.logoBox}>
+          <Text style={styles.logoText}>M</Text>
         </View>
 
-        <Text style={{ fontSize: 22, fontWeight: "600" }}>
-          Join MindEase
-        </Text>
-        <Text style={{ color: "#777", marginTop: 4, textAlign: "center" }}>
+        <Text style={styles.title}>Join MindEase</Text>
+        <Text style={styles.subtitle}>
           Create your account to start your wellness journey
         </Text>
       </View>
 
-      <View style={{ marginTop: 32 }}>
-        <Text style={{ marginBottom: 6, color: "#555" }}>Email</Text>
+      {/* Form */}
+      <View style={styles.form}>
+        <Text style={styles.label}>Email</Text>
         <TextInput
           placeholder="Enter your email"
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
-          style={{
-            borderWidth: 1,
-            borderColor: "#ddd",
-            borderRadius: 8,
-            padding: 12,
-            marginBottom: 16,
-          }}
-        />  </View>
+          placeholderTextColor="#9CA3AF"
+          style={styles.input}
+        />
 
-
-
-      {/* Form */}
-      <View style={{ marginTop: 6 }}>
-        <Text style={{ marginBottom: 6, color: "#555" }}>Username</Text>
+        <Text style={styles.label}>Username</Text>
         <TextInput
           placeholder="Enter your username"
           value={username}
           onChangeText={setUsername}
           autoCapitalize="none"
-          style={{
-            borderWidth: 1,
-            borderColor: "#ddd",
-            borderRadius: 8,
-            padding: 12,
-            marginBottom: 16,
-          }}
+          placeholderTextColor="#9CA3AF"
+          style={styles.input}
         />
 
-        <Text style={{ marginBottom: 6, color: "#555" }}>Password</Text>
+        <Text style={styles.label}>Password</Text>
         <TextInput
           placeholder="Enter your password"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
-          style={{
-            borderWidth: 1,
-            borderColor: "#ddd",
-            borderRadius: 8,
-            padding: 12,
-            marginBottom: 16,
-          }}
+          placeholderTextColor="#9CA3AF"
+          style={styles.input}
         />
 
-        <Text style={{ marginBottom: 6, color: "#555" }}>
-          Confirm Password
-        </Text>
+        <Text style={styles.label}>Confirm Password</Text>
         <TextInput
           placeholder="Re-enter your password"
           value={confirmPassword}
           onChangeText={setConfirmPassword}
           secureTextEntry
-          style={{
-            borderWidth: 1,
-            borderColor: "#ddd",
-            borderRadius: 8,
-            padding: 12,
-            marginBottom: 12,
-          }}
+          placeholderTextColor="#9CA3AF"
+          style={styles.input}
         />
 
         {/* Error Message */}
         {error ? (
-          <Text style={{ color: "red", marginBottom: 12 }}>
-            {error}
-          </Text>
+          <View style={styles.errorBox}>
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
         ) : null}
 
         {/* Sign Up Button */}
         <Pressable
           onPress={handleSignup}
-          style={{
-            backgroundColor: "#2DBE60",
-            paddingVertical: 14,
-            borderRadius: 8,
-            alignItems: "center",
-            marginTop: 8,
-          }}
+          disabled={isSubmitting}
+          style={({ pressed }) => [
+            styles.primaryButton,
+            (pressed || isSubmitting) && styles.primaryButtonPressed,
+          ]}
         >
-          <Text style={{ color: "#fff", fontWeight: "600", fontSize: 16 }}>
-            Create Account
-          </Text>
+          {isSubmitting ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.primaryButtonText}>Create Account</Text>
+          )}
         </Pressable>
       </View>
 
@@ -234,3 +211,85 @@ if (password.length < 6) {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 24,
+    backgroundColor: "#fff",
+  },
+  header: {
+    alignItems: "center",
+    marginTop: 44,
+  },
+  logoBox: {
+    width: 60,
+    height: 60,
+    borderRadius: 12,
+    backgroundColor: "#2DBE60",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 12,
+  },
+  logoText: {
+    color: "#fff",
+    fontSize: 28,
+    fontWeight: "bold",
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#111827",
+  },
+  subtitle: {
+    color: "#6B7280",
+    marginTop: 6,
+    textAlign: "center",
+  },
+  form: {
+    marginTop: 28,
+  },
+  label: {
+    marginBottom: 6,
+    color: "#374151",
+    fontWeight: "600",
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    marginBottom: 14,
+    color: "#111827",
+    backgroundColor: "#fff",
+  },
+  errorBox: {
+    backgroundColor: "#FEF2F2",
+    borderColor: "#FCA5A5",
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginBottom: 12,
+  },
+  errorText: {
+    color: "#B91C1C",
+    fontWeight: "600",
+  },
+  primaryButton: {
+    backgroundColor: "#2DBE60",
+    paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 6,
+  },
+  primaryButtonPressed: {
+    opacity: 0.9,
+  },
+  primaryButtonText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 16,
+  },
+});

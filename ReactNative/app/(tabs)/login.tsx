@@ -1,13 +1,22 @@
 import { router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useState } from "react";
-import { Alert, Pressable, Text, TextInput, View } from "react-native";
+import {
+    ActivityIndicator,
+    Alert,
+    Pressable,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
+} from "react-native";
 
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const BaseUrl = "https://mindeasebackend-production.up.railway.app/api"
 
   const checkLogin = async (
@@ -49,107 +58,92 @@ export default function Login() {
   const handleLogin = async () => {
     setError("");
 
+    if (isSubmitting) return;
+
     if (!email.trim() || !password.trim()) {
       setError("Please ensure all fields are filled.");
       return;
     }
 
-    const isLoginSuccessful = await checkLogin(email, password);
-    if (isLoginSuccessful) {
-      Alert.alert(
-        "Login successful",
-        "Welcome back!",
-        [
-          {
-            text: "OK",
-            onPress: () => router.replace("/(tabs)/homepage"),
-          },
-        ]
-      );
-    } else {
-      setError("Invalid email or password.");
+    setIsSubmitting(true);
+    try {
+      const isLoginSuccessful = await checkLogin(email, password);
+      if (isLoginSuccessful) {
+        Alert.alert(
+          "Login successful",
+          "Welcome back!",
+          [
+            {
+              text: "OK",
+              onPress: () => router.replace("/(tabs)/homepage"),
+            },
+          ]
+        );
+      } else {
+        setError("Invalid email or password.");
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
 
   return (
-    <View style={{ flex: 1, padding: 24, backgroundColor: "#fff" }}>
+    <View style={styles.container}>
       {/* Logo + Welcome */}
-      <View style={{ alignItems: "center", marginTop: 40 }}>
-        <View
-          style={{
-            width: 60,
-            height: 60,
-            borderRadius: 12,
-            backgroundColor: "#2DBE60",
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: 12,
-          }}
-        >
-          <Text style={{ color: "#fff", fontSize: 28, fontWeight: "bold" }}>
-            M
-          </Text>
+      <View style={styles.header}>
+        <View style={styles.logoBox}>
+          <Text style={styles.logoText}>M</Text>
         </View>
 
-        <Text style={{ fontSize: 22, fontWeight: "600" }}>Welcome!</Text>
-        <Text style={{ color: "#777", marginTop: 4 }}>
-          Sign in to continue your wellness journey
-        </Text>
+        <Text style={styles.title}>Welcome!</Text>
+        <Text style={styles.subtitle}>Sign in to continue your wellness journey</Text>
       </View>
 
       {/* Form */}
-      <View style={{ marginTop: 32 }}>
-        <Text style={{ marginBottom: 6, color: "#555" }}>Email Address</Text>
+      <View style={styles.form}>
+        <Text style={styles.label}>Email Address</Text>
         <TextInput
           placeholder="Enter your email"
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
           keyboardType="email-address"
-          style={{
-            borderWidth: 1,
-            borderColor: "#ddd",
-            borderRadius: 8,
-            padding: 12,
-            marginBottom: 16,
-          }}
+          placeholderTextColor="#9CA3AF"
+          style={styles.input}
         />
 
-        <Text style={{ marginBottom: 6, color: "#555" }}>Password</Text>
+        <Text style={styles.label}>Password</Text>
         <TextInput
           placeholder="Enter your password"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
-          style={{
-            borderWidth: 1,
-            borderColor: "#ddd",
-            borderRadius: 8,
-            padding: 12,
-            marginBottom: 12,
-          }}
+          placeholderTextColor="#9CA3AF"
+          style={styles.input}
         />
 
         {/* Error */}
         {error ? (
-          <Text style={{ color: "red", marginBottom: 12 }}>{error}</Text>
+          <View style={styles.errorBox}>
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
         ) : null}
 
         {/* Sign In Button */}
         <Pressable
           onPress={handleLogin}
-          style={{
-            backgroundColor: "#2DBE60",
-            paddingVertical: 14,
-            borderRadius: 8,
-            alignItems: "center",
-            marginTop: 8,
-          }}
+          disabled={isSubmitting}
+          style={({ pressed }) => [
+            styles.primaryButton,
+            (pressed || isSubmitting) && styles.primaryButtonPressed,
+          ]}
         >
-          <Text style={{ color: "#fff", fontWeight: "600", fontSize: 16 }}>
-            Sign In
-          </Text>
+          {isSubmitting ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.primaryButtonText}>Sign In</Text>
+          )}
         </Pressable>
       </View>
 
@@ -192,10 +186,92 @@ export default function Login() {
       <View style={{ marginTop: 32, alignItems: "center" }}>
         <Pressable onPress={() => router.push("/signup")}>
           <Text style={{ color: "#2DBE60" }}>
-            Don’t have an account? Sign up yeah
+            Don’t have an account? Sign up
           </Text>
         </Pressable>
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 24,
+    backgroundColor: "#fff",
+  },
+  header: {
+    alignItems: "center",
+    marginTop: 44,
+  },
+  logoBox: {
+    width: 60,
+    height: 60,
+    borderRadius: 12,
+    backgroundColor: "#2DBE60",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 12,
+  },
+  logoText: {
+    color: "#fff",
+    fontSize: 28,
+    fontWeight: "bold",
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#111827",
+  },
+  subtitle: {
+    color: "#6B7280",
+    marginTop: 6,
+    textAlign: "center",
+  },
+  form: {
+    marginTop: 28,
+  },
+  label: {
+    marginBottom: 6,
+    color: "#374151",
+    fontWeight: "600",
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    marginBottom: 14,
+    color: "#111827",
+    backgroundColor: "#fff",
+  },
+  errorBox: {
+    backgroundColor: "#FEF2F2",
+    borderColor: "#FCA5A5",
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginBottom: 12,
+  },
+  errorText: {
+    color: "#B91C1C",
+    fontWeight: "600",
+  },
+  primaryButton: {
+    backgroundColor: "#2DBE60",
+    paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 6,
+  },
+  primaryButtonPressed: {
+    opacity: 0.9,
+  },
+  primaryButtonText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 16,
+  },
+});
