@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import { useAppSelector } from "../../src/store/hooks";
+import { useAppSelector } from "../src/store/hooks";
 
 export default function Stress() {
   const mood = useAppSelector(state => state.mind.mood);

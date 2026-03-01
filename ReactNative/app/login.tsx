@@ -11,6 +11,8 @@ import {
     View,
 } from "react-native";
 import { Modal } from "react-native";
+import {setAuth,clearAuth} from "../src/store/authslice";
+
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -36,22 +38,27 @@ export default function Login() {
     });
 
 
-    if (res.ok) {
-      const data = await res.json();
-      console.log("Login successful:", data);
-      const {token} = data;
-      if (token) {
-        await SecureStore.setItemAsync("authToken", token);
-        return true;
-      }
+if (res.ok) {
+  const data = await res.json();
+  console.log("Login successful:", data);
 
-      console.error("No token returned");
-      return false;
-    } else {
-      const errorData = await res.json();
-      console.error("Login failed:", errorData);
-      return false;
-    }
+  const token = data?.token;
+  const userId = data?.userId ?? data?.user?.id;
+
+  if (typeof token === "string" && (userId !== undefined && userId !== null)) {
+    await SecureStore.setItemAsync("authToken", token);
+    await SecureStore.setItemAsync("userId", String(userId));
+
+    return true;
+  }
+
+  console.error("Missing token or userId:", { token, userId });
+  return false;
+} else {
+  const errorData = await res.json();
+  console.error("Login failed:", errorData);
+  return false;
+}
   } catch (err) {
     console.error("Error during login:", err);
     return false;

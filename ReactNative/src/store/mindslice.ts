@@ -1,15 +1,20 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Timespan } from "react-native/Libraries/Utilities/IPerformanceLogger";
 
 export interface MindState {
   userName: string;
   mood: number | null;
   goals: { id: string; title: string; done: boolean }[];
+  alarm: {id:string;title:string;time:Timespan;note:string}[];
+  
 }
 
 const initialState: MindState = {
   userName: "User",
   mood: null,
   goals: [],
+  alarm: [],
+
 };
 
 const mindSlice = createSlice({
@@ -26,6 +31,7 @@ const mindSlice = createSlice({
         done: false,
       });
     },
+
     toggleGoal(state, action: PayloadAction<string>) {
       const goal = state.goals.find(g => g.id === action.payload);
       if (goal) goal.done = !goal.done;
