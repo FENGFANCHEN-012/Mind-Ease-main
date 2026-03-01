@@ -9,6 +9,8 @@ import {
     TextInput,
     View,
 } from "react-native";
+import { Modal } from "react-native";
+
 
 export default function Signup() {
   const [email,setEmail] = useState("");
@@ -17,6 +19,7 @@ export default function Signup() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
   const BaseUrl = "https://mindeasebackend-production.up.railway.app/api"
   
 const submitData = async (
@@ -103,16 +106,11 @@ if (password.length < 6) {
    
     // After successful signup, redirect to login
       if(!success) return;
-      Alert.alert(
-        "Signup successful",
-        "Your account has been created. You can log in now.",
-        [
-          {
-            text: "OK",
-            onPress: () => router.replace("/login"),
-          },
-        ]
-      );
+      setShowPopup(true);
+       setTimeout(() => {
+        setShowPopup(false);
+        router.replace("/login");
+      }, 2000);
     } finally {
       setIsSubmitting(false);
     }
@@ -166,6 +164,8 @@ if (password.length < 6) {
           style={styles.input}
         />
 
+
+        
         <Text style={styles.label}>Confirm Password</Text>
         <TextInput
           placeholder="Re-enter your password"
@@ -208,9 +208,42 @@ if (password.length < 6) {
           </Text>
         </Pressable>
       </View>
+   
+   
+
+{/* Success Modal */}
+
+<Modal
+  visible={showPopup}
+  transparent
+  animationType="fade"
+>
+  <View style={styles.modalOverlay}>
+    <View style={styles.modalBox}>
+      <Text style={styles.modalTitle}>Signup Successful 🎉</Text>
+
+      <Pressable
+        onPress={() => setShowPopup(false)}
+        style={styles.modalButton}
+      >
+        <Text style={{ color: "#fff" }}>OK</Text>
+      </Pressable>
     </View>
+  </View>
+</Modal>
+
+
+
+    </View>
+    
+    
   );
 }
+
+
+
+
+//  Stylesheet
 
 const styles = StyleSheet.create({
   container: {
@@ -292,4 +325,34 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     fontSize: 16,
   },
+
+// Model Overlay CSS
+modalOverlay: {
+  flex: 1,
+  backgroundColor: "rgba(0,0,0,0.5)",
+  justifyContent: "center",
+  alignItems: "center",
+},
+
+modalBox: {
+  width: "80%",
+  backgroundColor: "#fff",
+  borderRadius: 16,
+  padding: 24,
+  alignItems: "center",
+},
+
+modalTitle: {
+  fontSize: 18,
+  fontWeight: "700",
+  marginBottom: 16,
+},
+
+modalButton: {
+  backgroundColor: "#2DBE60",
+  paddingVertical: 10,
+  paddingHorizontal: 20,
+  borderRadius: 8,
+},
+
 });
