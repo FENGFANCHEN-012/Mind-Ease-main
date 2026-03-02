@@ -5,6 +5,9 @@ use App\Http\Controllers\UserController;
 
 Route::post('/login', [UserController::class, 'login']);
 Route::post('/user/signup',[UserController::class ,'store']);
+Route::get('/users', [UserController::class, 'index']);
+Route::put('/user/update/{id}', [UserController::class, 'updateUserInfo
+
 
 Route::get('/test', function () {
     return response()->json([

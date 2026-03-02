@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Models\UserModel;
 
 class UserController extends Controller
 {
@@ -57,8 +58,27 @@ class UserController extends Controller
             'token' => $token,
         ]);
     }
-}
 
+    public function updateUserInfo(Request $request, $id) {
+        $request->validate([
+            'username' => 'required|string',
+            'age' => 'required|integer',
+            'gender' => 'required|string',
+        ]);
+        $result = UserModel::updateUser($id, $request->username, $request->gender, $request->age);
+        if ($result) {
+            return response()->json([
+                'message' => 'Information Set Successfully',
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'Failed to update user information',   
+            ], 500);    
+        }
+    }
+
+
+}
 
 class ProfileController extends Controller
 {
@@ -68,3 +88,4 @@ class ProfileController extends Controller
         return response()->json($user);
     }
 }
+

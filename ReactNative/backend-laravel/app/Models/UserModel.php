@@ -21,6 +21,12 @@ class UserModel extends Authenticatable
         'name',
         'email',
         'password',
+        'age',
+        'sex',
+        'username',
+        'ProfilePicture',
+        'role',
+        'phone_number',
     ];
 
     /**
@@ -44,5 +50,25 @@ class UserModel extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function updateUser($id, $username, $gender, $age) {
+
+        $sql = "
+            UPDATE users
+            SET username = :username,
+                gender = :gender,
+                age = :age
+            WHERE id = :id
+        ";
+
+        $stmt = $this->conn->prepare($sql);
+
+        return $stmt->execute([
+            ":username" => $username,
+            ":gender" => $gender,
+            ":age" => $age,
+            ":id" => $id
+        ]);
     }
 }

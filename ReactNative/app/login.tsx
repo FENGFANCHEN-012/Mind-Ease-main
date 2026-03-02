@@ -12,6 +12,10 @@ import {
 } from "react-native";
 import { Modal } from "react-native";
 import {setAuth,clearAuth} from "../src/store/authslice";
+import { setUserInfo } from "@/src/store/userslice";
+import { useAppDispatch } from "../src/store/hooks";
+import { Dispatch } from "@reduxjs/toolkit";
+
 
 
 export default function Login() {
@@ -22,7 +26,7 @@ export default function Login() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const BaseUrl = "https://mindeasebackend-production.up.railway.app/api"
- 
+  const dispatch: Dispatch = useAppDispatch();
   
   const checkLogin = async (
   email: string,
@@ -42,13 +46,25 @@ if (res.ok) {
   const data = await res.json();
   console.log("Login successful:", data);
 
+
   const token = data?.token;
   const userId = data?.userId ?? data?.user?.id;
 
   if (typeof token === "string" && (userId !== undefined && userId !== null)) {
     await SecureStore.setItemAsync("authToken", token);
     await SecureStore.setItemAsync("userId", String(userId));
-
+    const userInfo = {
+      id: userId,
+      email: data?.email ?? email,
+      userName: data?.name ?? "User",
+      age: data?.age ?? null,
+      sex: data?.sex ?? "Not specified",
+      slogan: data?.slogan ?? null,
+      profilePicture: data?.profilePicture ?? null,
+      phone_number: data?.phone_number ?? null,
+      role: data?.role ?? null,
+    };
+    dispatch(setUserInfo(userInfo));
     return true;
   }
 
@@ -82,7 +98,7 @@ if (res.ok) {
         setShowPopup(true);
         setTimeout(() => {
           setShowPopup(false);
-          router.replace("/homepage");
+          router.replace("/input_user_detail");
         }, 2000);
       
       } else {

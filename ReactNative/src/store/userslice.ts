@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { MindState } from "./mindslice";
 
 export interface UserInfo {
+  id: string;
   userName: string;
   age: number | null;
   sex: string;
@@ -12,7 +13,9 @@ export interface UserInfo {
   role: string | null;
 }
 
+
 const initialState: UserInfo = {
+  id: "",
   userName: "User",
   age: null,
   sex: "Not specified",
@@ -32,6 +35,16 @@ const userInfoSlice = createSlice({
       Object.assign(state, action.payload);
     },
     
+    setGender(state, action: PayloadAction<string>) {
+      state.sex = action.payload;
+    },
+
+    setAge(state, action: PayloadAction<number | null>) {
+      state.age = action.payload;
+    },
+    setUserName(state, action: PayloadAction<string>) {
+      state.userName = action.payload;
+    },
     clearUserInfo(state) {
       Object.assign(state, initialState);
     },
@@ -39,6 +52,6 @@ const userInfoSlice = createSlice({
   },
 });
 
-export const { setUserInfo, clearUserInfo } = userInfoSlice.actions;
+export const { setUserInfo, clearUserInfo, setGender, setAge, setUserName } = userInfoSlice.actions;
 export default userInfoSlice.reducer;
 
