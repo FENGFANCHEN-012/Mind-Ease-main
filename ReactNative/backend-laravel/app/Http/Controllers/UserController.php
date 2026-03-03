@@ -6,7 +6,6 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use App\Models\UserModel;
 
 class UserController extends Controller
 {
@@ -60,34 +59,39 @@ class UserController extends Controller
     }
     
     public function updateUserInfo(Request $request, $id) {
-        $request->validate([
-            'username' => 'required|string',
-            'age' => 'required|integer',
-            'gender' => 'required|string',
+        $validated = $request->validate([
+            'name' => 'sometimes|required|string',
+            'age' => 'sometimes|nullable|integer',
+            'sex' => 'sometimes|nullable|string',
         ]);
-        $result = UserModel::updateUser($id, $request->username, $request->gender, $request->age);
-        if ($result) {
+
+        $user = User::find($id);
+        if (!$user) {
             return response()->json([
-                'message' => 'Information Set Successfully',
-            ], 200);
-        } else {
-            return response()->json([
-                'message' => 'Failed to update user information',   
-            ], 500);    
+                'message' => 'User not found',
+            ], 404);
         }
+
+        $user->fill($validated);
+        $user->save();
+
+        return response()->json([
+            'message' => 'Information Set Successfully',
+            'user' => $user,
+        ], 200);
     }
 
     public function getUserInfo($id) {
-        $user = UserModel::getUserInfo($id);
-        if ($user) {
+        $user = User::find($id);
+        if (!$user) {
             return response()->json([
-                'user' => $user,
-            ], 200);
-        } else {
-            return response()->json([
-                'message' => 'Failed to get user information',
+                'message' => 'User not found',
             ], 404);
         }
+
+        return response()->json([
+            'user' => $user,
+        ], 200);
     }
     
 
