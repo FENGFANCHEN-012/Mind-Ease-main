@@ -65,6 +65,7 @@ if (res.ok) {
       role: data?.role ?? null,
     };
     dispatch(setUserInfo(userInfo));
+    dispatch(setAuth({ token, user: { id: userId, email: userInfo.email, username: userInfo.userName } }));
     return true;
   }
 

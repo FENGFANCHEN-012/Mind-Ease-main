@@ -71,4 +71,16 @@ class UserModel extends Authenticatable
             ":id" => $id
         ]);
     }
-}
+
+    public function getUserInfo($id) {
+        $sql = "SELECT username, gender, age, phone_number,sex,slogan,ProfilePicture FROM users WHERE id = :id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([":id" => $id]);
+        return $stmt->fetch();
+    
+    }    
+    
+    
+    
+    
+    }

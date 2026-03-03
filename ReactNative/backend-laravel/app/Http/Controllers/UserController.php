@@ -77,6 +77,19 @@ class UserController extends Controller
         }
     }
 
+    public function getUserInfo($id) {
+        $user = UserModel::getUserInfo($id);
+        if ($user) {
+            return response()->json([
+                'user' => $user,
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'Failed to get user information',
+            ], 404);
+        }
+    }
+
 
 }
 

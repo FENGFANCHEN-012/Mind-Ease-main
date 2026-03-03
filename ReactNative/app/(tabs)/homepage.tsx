@@ -12,6 +12,10 @@ import { router } from "expo-router";
 import { useAppDispatch, useAppSelector } from "../../src/store/hooks";
 import { setMood } from "../../src/store/mindslice";
 import { clearAuth } from "@/src/store/authslice";
+import { setUserName,setAge,setGender,setUserInfo} from "@/src/store/userslice";
+
+import * as SecureStore from "expo-secure-store";
+import { useEffect } from "react";
 
 const COLORS = {
   primary: "#2DBE60",
@@ -55,11 +59,37 @@ function practiceButton(p: Practice) {
 }
 
 export default function Home() {
+
   const dispatch = useAppDispatch();
- 
   const mood = useAppSelector((state) => state.mind.mood);
   const userName = useAppSelector((state) => state.mind.userName);
-  
+  const BaseUrl = "https://mindeasebackend-production.up.railway.app/api"
+
+  useEffect(() => {
+    
+    console.log("Getting user info");
+    getUserInfo();
+  }, []);
+
+  const getUserInfo = async () => {
+    try {
+      const userId = await SecureStore.getItemAsync("userId");
+      const token = await SecureStore.getItemAsync("authToken");
+      const res = await fetch(`${BaseUrl}/users/info/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) {
+        throw new Error("Failed to fetch user info");
+      }
+      const data = await res.json();
+      dispatch(setUserName(data.name));
+      
+    } catch (err) {
+      console.error("Error fetching user info:", err);
+    }
+  };
 
   // demo data
 
