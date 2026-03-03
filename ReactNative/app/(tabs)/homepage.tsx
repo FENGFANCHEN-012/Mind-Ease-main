@@ -1,20 +1,19 @@
-import React, { useMemo, useState } from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  Image,
-  StyleSheet,
-  ScrollView,
-  SafeAreaView,
-} from "react-native";
+import { clearAuth } from "@/src/store/authslice";
+import { setUserName } from "@/src/store/userslice";
 import { router } from "expo-router";
+import * as SecureStore from "expo-secure-store";
+import { useEffect, useMemo, useState } from "react";
+import {
+    Image,
+    Pressable,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
+} from "react-native";
 import { useAppDispatch, useAppSelector } from "../../src/store/hooks";
 import { setMood } from "../../src/store/mindslice";
-import { clearAuth } from "@/src/store/authslice";
-import { setUserName,setAge,setGender,setUserInfo} from "@/src/store/userslice";
-import * as SecureStore from "expo-secure-store";
-import { useEffect } from "react";
 
 const COLORS = {
   primary: "#2DBE60",
@@ -74,16 +73,26 @@ export default function Home() {
     try {
       const userId = await SecureStore.getItemAsync("userId");
       const token = await SecureStore.getItemAsync("authToken");
+
+      if (!userId) {
+        throw new Error("Missing userId in SecureStore");
+      }
+      if (!token) {
+        throw new Error("Missing authToken in SecureStore");
+      }
+
       const res = await fetch(`${BaseUrl}/users/info/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       if (!res.ok) {
-        throw new Error("Failed to fetch user info");
+        const raw = await res.text();
+        throw new Error(`Failed to fetch user info (${res.status}): ${raw}`);
       }
       const data = await res.json();
-      dispatch(setUserName(data.name));
+      const user = data?.user ?? data;
+      dispatch(setUserName(user?.name ?? "User"));
       
     } catch (err) {
       console.error("Error fetching user info:", err);
