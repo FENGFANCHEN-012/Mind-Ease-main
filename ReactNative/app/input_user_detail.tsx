@@ -38,7 +38,7 @@ type Gender = "male" | "female" | "other" | "prefer_not";
 export default function OnboardingProfile() {
   const BaseUrl = "https://mindeasebackend-production.up.railway.app/api"
   const dispatch = useAppDispatch();
-  const existingName = useAppSelector((s) => s.mind.userName);
+  const existingName = useAppSelector((s) => s.userInfo.name);
 
   const [username, setUsernameLocal] = useState(existingName ?? "");
   const [gender, setGenderLocal] = useState<Gender>("prefer_not");

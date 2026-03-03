@@ -60,7 +60,7 @@ export default function Home() {
 
   const dispatch = useAppDispatch();
   const mood = useAppSelector((state) => state.mind.mood);
-  const userName = useAppSelector((state) => state.mind.userName);
+  const userName = useAppSelector((state) => state.userInfo.name);
   const BaseUrl = "https://mindeasebackend-production.up.railway.app/api"
 
   useEffect(() => {

@@ -75,7 +75,7 @@ if (res.ok) {
     const userInfo = {
       id: userId,
       email: data?.email ?? email,
-      userName: data?.name ?? "User",
+      name: data?.name ?? "User",
       age: data?.age ?? null,
       sex: data?.sex ?? "Not specified",
       slogan: data?.slogan ?? null,
@@ -84,7 +84,7 @@ if (res.ok) {
       role: data?.role ?? null,
     };
     dispatch(setUserInfo(userInfo));
-    dispatch(setAuth({ token, user: { id: userId, email: userInfo.email, username: userInfo.userName } }));
+    dispatch(setAuth({ token, user: { id: userId, email: userInfo.email, name: userInfo.name } }));
    
     return true;
   }

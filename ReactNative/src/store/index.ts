@@ -1,9 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import mindReducer from "./mindslice";
+import userInfoReducer from "./userslice";
+import authReducer from "./authslice";
 
 export const store = configureStore({
   reducer: {
     mind: mindReducer, 
+    userInfo: userInfoReducer,
+    auth: authReducer,
   },
 });
 

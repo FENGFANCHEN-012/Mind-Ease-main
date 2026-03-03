@@ -1,9 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { MindState } from "./mindslice";
 
 export interface UserInfo {
   id: string;
-  userName: string;
+  name: string;
   age: number | null;
   sex: string;
   slogan: string | null;
@@ -16,7 +15,7 @@ export interface UserInfo {
 
 const initialState: UserInfo = {
   id: "",
-  userName: "User",
+  name: "User",
   age: null,
   sex: "Not specified",
     slogan: null,
@@ -43,7 +42,7 @@ const userInfoSlice = createSlice({
       state.age = action.payload;
     },
     setUserName(state, action: PayloadAction<string>) {
-      state.userName = action.payload;
+      state.name = action.payload;
     },
     clearUserInfo(state) {
       Object.assign(state, initialState);

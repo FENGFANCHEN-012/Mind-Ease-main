@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Timespan } from "react-native/Libraries/Utilities/IPerformanceLogger";
 
 export interface MindState {
-  userName: string;
+
   mood: number | null;
   goals: { id: string; title: string; done: boolean }[];
   alarm: {id:string;title:string;time:Timespan;note:string}[];
@@ -10,7 +10,7 @@ export interface MindState {
 }
 
 const initialState: MindState = {
-  userName: "User",
+
   mood: null,
   goals: [],
   alarm: [],
