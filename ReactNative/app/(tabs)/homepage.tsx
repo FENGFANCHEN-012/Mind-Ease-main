@@ -13,7 +13,6 @@ import { useAppDispatch, useAppSelector } from "../../src/store/hooks";
 import { setMood } from "../../src/store/mindslice";
 import { clearAuth } from "@/src/store/authslice";
 import { setUserName,setAge,setGender,setUserInfo} from "@/src/store/userslice";
-
 import * as SecureStore from "expo-secure-store";
 import { useEffect } from "react";
 

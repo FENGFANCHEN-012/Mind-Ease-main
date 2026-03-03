@@ -15,6 +15,7 @@ import {setAuth,clearAuth} from "../src/store/authslice";
 import { setUserInfo } from "@/src/store/userslice";
 import { useAppDispatch } from "../src/store/hooks";
 import { Dispatch } from "@reduxjs/toolkit";
+import { setItemAsync } from "expo-secure-store";
 
 
 
@@ -27,7 +28,27 @@ export default function Login() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const BaseUrl = "https://mindeasebackend-production.up.railway.app/api"
   const dispatch: Dispatch = useAppDispatch();
-  
+  const getUserInfo = async () => {
+      try {
+        const userId = await SecureStore.getItemAsync("userId");
+        const token = await SecureStore.getItemAsync("authToken");
+        const res = await fetch(`${BaseUrl}/users/info/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!res.ok) {
+          throw new Error("Failed to fetch user info");
+        }
+        const data = await res.json();
+        const first_log_in = data?.first_log_in ?? false;
+        await SecureStore.setItemAsync("first_log_in", first_log_in ? "true" : "false");
+        
+      } catch (err) {
+        console.error("Error fetching user info:", err);
+      }
+    };
+
   const checkLogin = async (
   email: string,
   password: string
@@ -45,11 +66,9 @@ export default function Login() {
 if (res.ok) {
   const data = await res.json();
   console.log("Login successful:", data);
-
-
   const token = data?.token;
   const userId = data?.userId ?? data?.user?.id;
-
+  
   if (typeof token === "string" && (userId !== undefined && userId !== null)) {
     await SecureStore.setItemAsync("authToken", token);
     await SecureStore.setItemAsync("userId", String(userId));
@@ -66,8 +85,10 @@ if (res.ok) {
     };
     dispatch(setUserInfo(userInfo));
     dispatch(setAuth({ token, user: { id: userId, email: userInfo.email, username: userInfo.userName } }));
+   
     return true;
   }
+
 
   console.error("Missing token or userId:", { token, userId });
   return false;
@@ -97,9 +118,12 @@ if (res.ok) {
       const isLoginSuccessful = await checkLogin(email, password);
       if (isLoginSuccessful) {
         setShowPopup(true);
-        setTimeout(() => {
+        setTimeout(async () => {
           setShowPopup(false);
-          router.replace("/input_user_detail");
+          const firstLogIn = await SecureStore.getItemAsync("first_log_in");
+          if (firstLogIn === "true") {router.replace("/input_user_detail");}
+          else {router.replace("/homepage");}
+          
         }, 2000);
       
       } else {

@@ -15,7 +15,8 @@ import { router } from "expo-router";
 import { useAppDispatch, useAppSelector } from "@/src/store/hooks";
 import { setUserName, setGender, setAge } from "../src/store/userslice";
 import * as SecureStore from "expo-secure-store";
-
+import { Dispatch } from "@reduxjs/toolkit";
+import {useEffect} from "react";
 // ------------------------------
 
 
@@ -44,6 +45,8 @@ export default function OnboardingProfile() {
   const [ageText, setAgeText] = useState("");
 
 
+
+
   const  updateUserInfo = async (sex:string,
     age:number | null,
     userName:string) => {
@@ -68,6 +71,7 @@ export default function OnboardingProfile() {
       console.error("Error updating user info:", err);
     }
   }
+
   const ageNum = useMemo(() => {
     const n = Number(ageText);
     if (!Number.isFinite(n)) return null;
@@ -100,7 +104,6 @@ export default function OnboardingProfile() {
     if (!canContinue) return;
 
  
-    
     goNext();
   };
 

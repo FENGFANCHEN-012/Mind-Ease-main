@@ -68,7 +68,8 @@ class UserModel extends Authenticatable
             ":username" => $username,
             ":gender" => $gender,
             ":age" => $age,
-            ":id" => $id
+            ":id" => $id,
+            ":first_login" => false
         ]);
     }
 

@@ -58,7 +58,7 @@ class UserController extends Controller
             'token' => $token,
         ]);
     }
-
+    
     public function updateUserInfo(Request $request, $id) {
         $request->validate([
             'username' => 'required|string',
@@ -89,7 +89,7 @@ class UserController extends Controller
             ], 404);
         }
     }
-
+    
 
 }
 
