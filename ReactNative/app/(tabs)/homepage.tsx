@@ -147,7 +147,7 @@ export default function Home() {
             </View>
           </View>
 
-          <Pressable onPress={() => router.push("/profile")} style={styles.avatarWrap}>
+          <Pressable onPress={() => router.push("./profile")} style={styles.avatarWrap}>
             <Image source={{ uri: "https://i.pravatar.cc/150" }} style={styles.avatar} />
           </Pressable>
         </View>
