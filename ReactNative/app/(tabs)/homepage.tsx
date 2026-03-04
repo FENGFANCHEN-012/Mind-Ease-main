@@ -156,8 +156,10 @@ export default function Home() {
         <View style={styles.rowBetween}>
           <Text style={styles.smallHint}>Current mood: {mood ?? "none"}</Text>
           <Pressable
-            onPress={() => {
+            onPress={async () => {
               dispatch(clearAuth());
+              await SecureStore.deleteItemAsync("authToken");
+              await SecureStore.deleteItemAsync("userId");
               router.replace("/login");
             }}
             style={styles.logoutBtn}

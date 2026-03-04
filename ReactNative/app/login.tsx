@@ -16,7 +16,7 @@ import { setUserInfo } from "@/src/store/userslice";
 import { useAppDispatch } from "../src/store/hooks";
 import { Dispatch } from "@reduxjs/toolkit";
 import { setItemAsync } from "expo-secure-store";
-
+import { removeFirstLogIn } from "../src/store/authslice";
 
 
 export default function Login() {
@@ -24,8 +24,9 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPopup, setShowPopup] = useState(false);
-
+const [firstLogIn, setFirstLogIn] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const BaseUrl = "https://mindeasebackend-production.up.railway.app/api"
   const dispatch: Dispatch = useAppDispatch();
   const getUserInfo = async () => {
@@ -41,8 +42,9 @@ export default function Login() {
           throw new Error("Failed to fetch user info");
         }
         const data = await res.json();
-        const first_log_in = data?.first_log_in ?? false;
-        await SecureStore.setItemAsync("first_log_in", first_log_in ? "true" : "false");
+         const removeFirstLogInAction = removeFirstLogIn();
+        dispatch(removeFirstLogInAction);
+        setFirstLogIn(false);
         
       } catch (err) {
         console.error("Error fetching user info:", err);
@@ -85,7 +87,7 @@ if (res.ok) {
     };
     dispatch(setUserInfo(userInfo));
     dispatch(setAuth({ token, user: { id: userId, email: userInfo.email, name: userInfo.name } }));
-   
+     getUserInfo();
     return true;
   }
 
@@ -120,8 +122,8 @@ if (res.ok) {
         setShowPopup(true);
         setTimeout(async () => {
           setShowPopup(false);
-          const firstLogIn = await SecureStore.getItemAsync("first_log_in");
-          if (firstLogIn === "true") {router.replace("/input_user_detail");}
+         
+          if (firstLogIn === false) {router.replace("/input_user_detail");}
           else {router.replace("/homepage");}
           
         }, 2000);
