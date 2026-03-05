@@ -4,15 +4,20 @@ import { router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useEffect, useMemo, useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  Pressable,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
+    Alert,
+    SafeAreaView,
+    ScrollView,
 } from "react-native";
+import {
+    Button,
+    Card,
+    Input,
+    Paragraph,
+    Separator,
+    Text,
+    XStack,
+    YStack,
+} from "tamagui";
 import { useAppDispatch, useAppSelector } from "../../src/store/hooks";
  
 const COLORS = {
@@ -34,15 +39,17 @@ function initials(name: string) {
   const last = parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? "") : "";
   return (first + last).toUpperCase();
 }
- 
+
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <View style={styles.infoRow}>
-      <Text style={styles.infoLabel}>{label}</Text>
-      <Text style={styles.infoValue} numberOfLines={1}>
+    <XStack ai="center" jc="space-between" gap="$3" py="$3">
+      <Text color={COLORS.subtext} fontWeight="700" fontSize="$3">
+        {label}
+      </Text>
+      <Text color={COLORS.text} fontWeight="800" fontSize="$3" maxWidth="60%" textAlign="right">
         {value}
       </Text>
-    </View>
+    </XStack>
   );
 }
  
@@ -50,12 +57,29 @@ export default function Profile() {
   const dispatch = useAppDispatch();
   const userInfo = useAppSelector((s) => s.userInfo);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const [draftName, setDraftName] = useState("");
+  const [draftSex, setDraftSex] = useState("");
+  const [draftAge, setDraftAge] = useState("");
+  const [draftPhone, setDraftPhone] = useState("");
+  const [draftSlogan, setDraftSlogan] = useState("");
  
   const displayName = useMemo(() => userInfo.name ?? "User", [userInfo.name]);
   const displayEmail = useMemo(() => userInfo.email ?? "—", [userInfo.email]);
+
+  const resetDraft = () => {
+    setDraftName(userInfo.name ?? "");
+    setDraftSex(userInfo.sex ?? "");
+    setDraftAge(userInfo.age === null || userInfo.age === undefined ? "" : String(userInfo.age));
+    setDraftPhone(userInfo.phone_number ?? "");
+    setDraftSlogan(userInfo.slogan ?? "");
+  };
  
   useEffect(() => {
     refreshUserInfo();
+    resetDraft();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
  
@@ -94,15 +118,103 @@ export default function Profile() {
           role: user?.role ?? null,
         })
       );
+
+      // keep draft in sync if user isn't editing
+      if (!isEditing) {
+        resetDraft();
+      }
     } catch {
       // ignore
     } finally {
       setIsRefreshing(false);
     }
   };
- 
-  const onEditProfile = () => {
-    router.push("/input_user_detail");
+
+  const onToggleEdit = () => {
+    if (!isEditing) {
+      resetDraft();
+      setIsEditing(true);
+      return;
+    }
+    setIsEditing(false);
+    resetDraft();
+  };
+
+  const onSave = async () => {
+    if (isSaving) return;
+
+    const userId = await SecureStore.getItemAsync("userId");
+    const token = await SecureStore.getItemAsync("authToken");
+    if (!userId || !token) {
+      Alert.alert("Not logged in", "Missing login session. Please log in again.");
+      return;
+    }
+
+    const ageNum = draftAge.trim() === "" ? null : Number(draftAge);
+    if (draftAge.trim() !== "" && (!Number.isFinite(ageNum) || !Number.isInteger(ageNum))) {
+      Alert.alert("Invalid age", "Please enter a valid integer age.");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const BaseUrl = "https://mindeasebackend-production.up.railway.app/api";
+      const res = await fetch(`${BaseUrl}/user/update/${userId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: draftName,
+          sex: draftSex,
+          age: ageNum,
+          phone_number: draftPhone,
+          slogan: draftSlogan,
+        }),
+      });
+
+      const raw = await res.text();
+      let data: any = {};
+      try {
+        data = JSON.parse(raw);
+      } catch {
+        // ignore
+      }
+
+      if (!res.ok) {
+        const msg =
+          data?.message ||
+          (data?.errors ? JSON.stringify(data.errors) : raw || "Failed to update user info");
+        Alert.alert("Update failed", msg);
+        return;
+      }
+
+      const user = data?.user ?? data;
+      if (user) {
+        dispatch(
+          setUserInfo({
+            id: String(user?.id ?? userId ?? ""),
+            name: user?.name ?? draftName,
+            age: user?.age ?? ageNum,
+            sex: user?.sex ?? draftSex,
+            slogan: user?.slogan ?? draftSlogan,
+            profilePicture: user?.profilePicture ?? userInfo.profilePicture ?? null,
+            email: user?.email ?? userInfo.email ?? null,
+            phone_number: user?.phone_number ?? draftPhone,
+            role: user?.role ?? userInfo.role ?? null,
+          })
+        );
+      }
+
+      setIsEditing(false);
+      Alert.alert("Saved", "Your profile has been updated.");
+    } catch (e: any) {
+      Alert.alert("Network error", e?.message || "Failed to update user info");
+    } finally {
+      setIsSaving(false);
+    }
   };
  
   const onLogout = () => {
@@ -124,202 +236,165 @@ export default function Profile() {
   };
  
   return (
-    <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={styles.scroll}>
-        <View style={styles.headerCard}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{initials(displayName)}</Text>
-          </View>
- 
-          <View style={{ flex: 1 }}>
-            <Text style={styles.name} numberOfLines={1}>
-              {displayName}
-            </Text>
-            <Text style={styles.email} numberOfLines={1}>
-              {displayEmail}
-            </Text>
-          </View>
- 
-          <Pressable onPress={refreshUserInfo} style={styles.refreshBtn}>
-            {isRefreshing ? (
-              <ActivityIndicator color={COLORS.primary} />
-            ) : (
-              <Text style={styles.refreshText}>Refresh</Text>
-            )}
-          </Pressable>
-        </View>
- 
-        <View style={styles.sectionTitleRow}>
-          <Text style={styles.sectionTitle}>Profile</Text>
-          <Pressable onPress={onEditProfile} hitSlop={10}>
-            <Text style={styles.editText}>Edit</Text>
-          </Pressable>
-        </View>
- 
-        <View style={styles.card}>
-          <InfoRow label="User ID" value={userInfo.id ? String(userInfo.id) : "—"} />
-          <View style={styles.divider} />
-          <InfoRow label="Age" value={userInfo.age !== null ? String(userInfo.age) : "—"} />
-          <View style={styles.divider} />
-          <InfoRow label="Gender" value={userInfo.sex || "—"} />
-          <View style={styles.divider} />
-          <InfoRow label="Phone" value={userInfo.phone_number || "—"} />
-          <View style={styles.divider} />
-          <InfoRow label="Role" value={userInfo.role || "—"} />
-        </View>
- 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Slogan</Text>
-          <Text style={styles.sloganText}>{userInfo.slogan || "—"}</Text>
-        </View>
- 
-        <Pressable onPress={onLogout} style={styles.logoutBtn}>
-          <Text style={styles.logoutText}>Log out</Text>
-        </Pressable>
+    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.bg }}>
+      <ScrollView
+        contentContainerStyle={{
+          flexGrow: 1,
+          padding: 16,
+        }}
+      >
+        <YStack flex={1} jc="center" ai="center">
+          <YStack width="100%" maxWidth={460} gap="$4" mt="$6">
+            <Card bordered backgroundColor={COLORS.card} borderColor={COLORS.border} padding="$4">
+              <XStack ai="center" jc="space-between" gap="$3">
+                <XStack ai="center" gap="$3" flex={1}>
+                  <YStack
+                    width={56}
+                    height={56}
+                    borderRadius={18}
+                    backgroundColor={COLORS.primarySoft}
+                    borderWidth={1}
+                    borderColor="rgba(45, 190, 96, 0.25)"
+                    ai="center"
+                    jc="center"
+                  >
+                    <Text color={COLORS.primary} fontWeight="800" fontSize="$6">
+                      {initials(displayName)}
+                    </Text>
+                  </YStack>
+
+                  <YStack flex={1} gap="$1">
+                    <Text color={COLORS.text} fontSize="$6" fontWeight="800" numberOfLines={1}>
+                      {displayName}
+                    </Text>
+                    <Paragraph color={COLORS.subtext} numberOfLines={1}>
+                      {displayEmail}
+                    </Paragraph>
+                  </YStack>
+                </XStack>
+
+                <Button
+                  size="$3"
+                  backgroundColor={COLORS.primarySoft}
+                  borderColor="rgba(45, 190, 96, 0.25)"
+                  borderWidth={1}
+                  color={COLORS.primary}
+                  fontWeight="800"
+                  onPress={refreshUserInfo}
+                  disabled={isRefreshing}
+                >
+                  {isRefreshing ? "Refreshing" : "Refresh"}
+                </Button>
+              </XStack>
+            </Card>
+
+            <XStack ai="center" jc="space-between">
+              <Text color={COLORS.text} fontWeight="800" fontSize="$5">
+                Profile
+              </Text>
+              <XStack gap="$2">
+                <Button
+                  size="$3"
+                  backgroundColor={isEditing ? "#FFFFFF" : COLORS.primarySoft}
+                  borderColor={isEditing ? COLORS.border : "rgba(45, 190, 96, 0.25)"}
+                  borderWidth={1}
+                  color={isEditing ? COLORS.subtext : COLORS.primary}
+                  fontWeight="800"
+                  onPress={onToggleEdit}
+                >
+                  {isEditing ? "Cancel" : "Edit"}
+                </Button>
+
+                {isEditing ? (
+                  <Button
+                    size="$3"
+                    backgroundColor={COLORS.primary}
+                    borderColor={COLORS.primary}
+                    borderWidth={1}
+                    color="#fff"
+                    fontWeight="800"
+                    onPress={onSave}
+                    disabled={isSaving}
+                  >
+                    {isSaving ? "Saving" : "Save"}
+                  </Button>
+                ) : null}
+              </XStack>
+            </XStack>
+
+            <Card bordered backgroundColor={COLORS.card} borderColor={COLORS.border} padding="$4">
+              <InfoRow label="User ID" value={userInfo.id ? String(userInfo.id) : "—"} />
+              <Separator backgroundColor={COLORS.border} />
+
+              {isEditing ? (
+                <YStack gap="$3" py="$3">
+                  <YStack gap="$2">
+                    <Text color={COLORS.subtext} fontWeight="700" fontSize="$3">
+                      Name
+                    </Text>
+                    <Input value={draftName} onChangeText={setDraftName} backgroundColor="#fff" />
+                  </YStack>
+
+                  <YStack gap="$2">
+                    <Text color={COLORS.subtext} fontWeight="700" fontSize="$3">
+                      Gender
+                    </Text>
+                    <Input value={draftSex} onChangeText={setDraftSex} backgroundColor="#fff" />
+                  </YStack>
+
+                  <YStack gap="$2">
+                    <Text color={COLORS.subtext} fontWeight="700" fontSize="$3">
+                      Age
+                    </Text>
+                    <Input value={draftAge} onChangeText={setDraftAge} keyboardType="number-pad" backgroundColor="#fff" />
+                  </YStack>
+
+                  <YStack gap="$2">
+                    <Text color={COLORS.subtext} fontWeight="700" fontSize="$3">
+                      Phone
+                    </Text>
+                    <Input value={draftPhone} onChangeText={setDraftPhone} keyboardType="phone-pad" backgroundColor="#fff" />
+                  </YStack>
+                </YStack>
+              ) : (
+                <YStack>
+                  <InfoRow label="Age" value={userInfo.age !== null ? String(userInfo.age) : "—"} />
+                  <Separator backgroundColor={COLORS.border} />
+                  <InfoRow label="Gender" value={userInfo.sex || "—"} />
+                  <Separator backgroundColor={COLORS.border} />
+                  <InfoRow label="Phone" value={userInfo.phone_number || "—"} />
+                  <Separator backgroundColor={COLORS.border} />
+                  <InfoRow label="Role" value={userInfo.role || "—"} />
+                </YStack>
+              )}
+            </Card>
+
+            <Card bordered backgroundColor={COLORS.card} borderColor={COLORS.border} padding="$4">
+              <Text color={COLORS.subtext} fontWeight="800" fontSize="$3" mb="$2">
+                Slogan
+              </Text>
+              {isEditing ? (
+                <Input value={draftSlogan} onChangeText={setDraftSlogan} backgroundColor="#fff" />
+              ) : (
+                <Paragraph color={COLORS.text} fontWeight="600">
+                  {userInfo.slogan || "—"}
+                </Paragraph>
+              )}
+            </Card>
+
+            <Button
+              backgroundColor="#fff"
+              borderColor="rgba(239, 68, 68, 0.35)"
+              borderWidth={1}
+              color={COLORS.danger}
+              fontWeight="900"
+              onPress={onLogout}
+            >
+              Log out
+            </Button>
+          </YStack>
+        </YStack>
       </ScrollView>
     </SafeAreaView>
   );
 }
- 
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: COLORS.bg,
-  },
-  scroll: {
-    padding: 16,
-    paddingBottom: 28,
-  },
-  headerCard: {
-    backgroundColor: COLORS.card,
-    borderRadius: 16,
-    padding: 14,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 2,
-  },
-  avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 18,
-    backgroundColor: COLORS.primarySoft,
-    borderWidth: 1,
-    borderColor: "rgba(45, 190, 96, 0.25)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  avatarText: {
-    color: COLORS.primary,
-    fontWeight: "800",
-    fontSize: 18,
-    letterSpacing: 0.4,
-  },
-  name: {
-    fontSize: 18,
-    fontWeight: "800",
-    color: COLORS.text,
-  },
-  email: {
-    marginTop: 2,
-    fontSize: 13,
-    color: COLORS.subtext,
-  },
-  refreshBtn: {
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 12,
-    backgroundColor: COLORS.primarySoft,
-    borderWidth: 1,
-    borderColor: "rgba(45, 190, 96, 0.25)",
-  },
-  refreshText: {
-    color: COLORS.primary,
-    fontWeight: "800",
-    fontSize: 12,
-  },
-  sectionTitleRow: {
-    marginTop: 18,
-    marginBottom: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "800",
-    color: COLORS.text,
-  },
-  editText: {
-    color: COLORS.primary,
-    fontWeight: "800",
-  },
-  card: {
-    backgroundColor: COLORS.card,
-    borderRadius: 16,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    shadowColor: "#000",
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 1,
-    marginBottom: 12,
-  },
-  cardTitle: {
-    fontSize: 13,
-    fontWeight: "800",
-    color: COLORS.subtext,
-    marginBottom: 8,
-  },
-  infoRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 12,
-    paddingVertical: 10,
-  },
-  infoLabel: {
-    color: COLORS.subtext,
-    fontWeight: "700",
-    fontSize: 13,
-  },
-  infoValue: {
-    color: COLORS.text,
-    fontWeight: "800",
-    fontSize: 13,
-    maxWidth: "62%",
-    textAlign: "right",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: COLORS.border,
-  },
-  sloganText: {
-    color: COLORS.text,
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: "600",
-  },
-  logoutBtn: {
-    marginTop: 8,
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "rgba(239, 68, 68, 0.35)",
-    borderRadius: 14,
-    paddingVertical: 14,
-    alignItems: "center",
-  },
-  logoutText: {
-    color: COLORS.danger,
-    fontWeight: "900",
-    fontSize: 14,
-  },
-});

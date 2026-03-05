@@ -63,6 +63,8 @@ class UserController extends Controller
             'name' => 'sometimes|required|string',
             'age' => 'sometimes|nullable|integer',
             'sex' => 'sometimes|nullable|string',
+            'phone_number' => 'sometimes|nullable|string',
+            'slogan' => 'sometimes|nullable|string',
         ]);
 
         $user = User::find($id);
