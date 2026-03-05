@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import {
     Button,
-    Card,
     Input,
     Paragraph,
     Separator,
@@ -94,6 +93,7 @@ export default function Profile() {
  
       const BaseUrl = "https://mindeasebackend-production.up.railway.app/api";
       const res = await fetch(`${BaseUrl}/users/info/${userId}`, {
+        method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: "application/json",
@@ -254,13 +254,12 @@ export default function Profile() {
               </Text>
             </YStack>
 
-            <Card
-              bordered
-              elevate
+            <YStack
               backgroundColor={COLORS.card}
               borderColor={COLORS.border}
-              padding="$4"
+              borderWidth={1}
               borderRadius="$8"
+              padding="$4"
             >
               <XStack ai="center" jc="space-between" gap="$3">
                 <XStack ai="center" gap="$3" flex={1}>
@@ -294,16 +293,16 @@ export default function Profile() {
                   backgroundColor={COLORS.primarySoft}
                   borderColor="rgba(45, 190, 96, 0.25)"
                   borderWidth={1}
-                  color={COLORS.primary}
-                  fontWeight="800"
                   onPress={refreshUserInfo}
                   disabled={isRefreshing}
                   borderRadius="$6"
                 >
-                  {isRefreshing ? "Refreshing" : "Refresh"}
+                  <Text color={COLORS.primary} fontWeight="900">
+                    {isRefreshing ? "Refreshing" : "Refresh"}
+                  </Text>
                 </Button>
               </XStack>
-            </Card>
+            </YStack>
 
             <XStack ai="center" jc="space-between">
               <Paragraph color={COLORS.subtext} fontWeight="700">
@@ -315,12 +314,12 @@ export default function Profile() {
                   backgroundColor={isEditing ? "#FFFFFF" : COLORS.primarySoft}
                   borderColor={isEditing ? COLORS.border : "rgba(45, 190, 96, 0.25)"}
                   borderWidth={1}
-                  color={isEditing ? COLORS.subtext : COLORS.primary}
-                  fontWeight="800"
                   onPress={onToggleEdit}
                   borderRadius="$6"
                 >
-                  {isEditing ? "Cancel" : "Edit"}
+                  <Text color={isEditing ? COLORS.subtext : COLORS.primary} fontWeight="900">
+                    {isEditing ? "Cancel" : "Edit"}
+                  </Text>
                 </Button>
 
                 {isEditing ? (
@@ -329,25 +328,24 @@ export default function Profile() {
                     backgroundColor={COLORS.primary}
                     borderColor={COLORS.primary}
                     borderWidth={1}
-                    color="#fff"
-                    fontWeight="800"
                     onPress={onSave}
                     disabled={isSaving}
                     borderRadius="$6"
                   >
-                    {isSaving ? "Saving" : "Save"}
+                    <Text color="#fff" fontWeight="900">
+                      {isSaving ? "Saving" : "Save"}
+                    </Text>
                   </Button>
                 ) : null}
               </XStack>
             </XStack>
 
-            <Card
-              bordered
-              elevate
+            <YStack
               backgroundColor={COLORS.card}
               borderColor={COLORS.border}
-              padding="$4"
+              borderWidth={1}
               borderRadius="$8"
+              padding="$4"
             >
               <InfoRow label="User ID" value={userInfo.id ? String(userInfo.id) : "—"} />
               <Separator backgroundColor={COLORS.border} />
@@ -419,15 +417,14 @@ export default function Profile() {
                   <InfoRow label="Role" value={userInfo.role || "—"} />
                 </YStack>
               )}
-            </Card>
+            </YStack>
 
-            <Card
-              bordered
-              elevate
+            <YStack
               backgroundColor={COLORS.card}
               borderColor={COLORS.border}
-              padding="$4"
+              borderWidth={1}
               borderRadius="$8"
+              padding="$4"
             >
               <Text color={COLORS.subtext} fontWeight="800" fontSize="$3" mb="$2">
                 Slogan
@@ -445,195 +442,22 @@ export default function Profile() {
                   {userInfo.slogan || "—"}
                 </Paragraph>
               )}
-            </Card>
+            </YStack>
 
             <Button
               backgroundColor="#fff"
+              borderColor="rgba(239, 68, 68, 0.35)"
+              borderWidth={1}
+              onPress={onLogout}
+              borderRadius="$6"
+            >
+              <Text color={COLORS.danger} fontWeight="900">
+                Log out
+              </Text>
+            </Button>
+          </YStack>
         </YStack>
-
-        <YStack flex={1} gap="$1">
-          <Text color={COLORS.text} fontSize="$6" fontWeight="800" numberOfLines={1}>
-            {displayName}
-          </Text>
-          <Paragraph color={COLORS.subtext} numberOfLines={1}>
-            {displayEmail}
-          </Paragraph>
-        </YStack>
-      </XStack>
-
-      <Button
-        size="$3"
-        backgroundColor={COLORS.primarySoft}
-        borderColor="rgba(45, 190, 96, 0.25)"
-        borderWidth={1}
-        color={COLORS.primary}
-        fontWeight="800"
-        onPress={refreshUserInfo}
-        disabled={isRefreshing}
-        borderRadius="$6"
-      >
-        {isRefreshing ? "Refreshing" : "Refresh"}
-      </Button>
-    </XStack>
-  </Card>
-
-  <XStack ai="center" jc="space-between" mt="$6">
-    <Paragraph color={COLORS.subtext} fontWeight="700" fontSize="$3">
-      Keep it simple. Update only what you want.
-    </Paragraph>
-    <XStack gap="$2">
-      <Button
-        size="$3"
-        backgroundColor={isEditing ? "#FFFFFF" : COLORS.primarySoft}
-        borderColor={isEditing ? COLORS.border : "rgba(45, 190, 96, 0.25)"}
-        borderWidth={1}
-        color={isEditing ? COLORS.subtext : COLORS.primary}
-        fontWeight="800"
-        onPress={onToggleEdit}
-        borderRadius="$6"
-      >
-        {isEditing ? "Cancel" : "Edit"}
-      </Button>
-
-      {isEditing ? (
-        <Button
-          size="$3"
-          backgroundColor={COLORS.primary}
-          borderColor={COLORS.primary}
-          borderWidth={1}
-          color="#fff"
-          fontWeight="800"
-          onPress={onSave}
-          disabled={isSaving}
-          borderRadius="$6"
-        >
-          {isSaving ? "Saving" : "Save"}
-        </Button>
-      ) : null}
-    </XStack>
-  </XStack>
-
-  <Card
-    bordered
-    elevate
-    backgroundColor={COLORS.card}
-    borderColor={COLORS.border}
-    padding="$4"
-    borderRadius="$8"
-    mt="$6"
-  >
-    <Text color={COLORS.subtext} fontWeight="800" fontSize="$3" mb="$2">
-      Profile
-    </Text>
-    <InfoRow label="User ID" value={userInfo.id ? String(userInfo.id) : "—"} />
-    <Separator backgroundColor={COLORS.border} />
-
-    {isEditing ? (
-      <YStack gap="$3" py="$3">
-        <YStack gap="$2">
-          <Text color={COLORS.subtext} fontWeight="700" fontSize="$3">
-            Name
-          </Text>
-          <Input
-            value={draftName}
-            onChangeText={setDraftName}
-            backgroundColor="#fff"
-            borderRadius="$6"
-            placeholder="Your name"
-          />
-        </YStack>
-
-        <YStack gap="$2">
-          <Text color={COLORS.subtext} fontWeight="700" fontSize="$3">
-            Gender
-          </Text>
-          <Input
-            value={draftSex}
-            onChangeText={setDraftSex}
-            backgroundColor="#fff"
-            borderRadius="$6"
-            placeholder="e.g. female / male"
-          />
-        </YStack>
-
-        <YStack gap="$2">
-          <Text color={COLORS.subtext} fontWeight="700" fontSize="$3">
-            Age
-          </Text>
-          <Input
-            value={draftAge}
-            onChangeText={setDraftAge}
-            keyboardType="number-pad"
-            backgroundColor="#fff"
-            borderRadius="$6"
-            placeholder="e.g. 21"
-          />
-        </YStack>
-
-        <YStack gap="$2">
-          <Text color={COLORS.subtext} fontWeight="700" fontSize="$3">
-            Phone
-          </Text>
-          <Input
-            value={draftPhone}
-            onChangeText={setDraftPhone}
-            keyboardType="phone-pad"
-            backgroundColor="#fff"
-            borderRadius="$6"
-            placeholder="Optional"
-          />
-        </YStack>
-      </YStack>
-    ) : (
-      <YStack>
-        <InfoRow label="Age" value={userInfo.age !== null ? String(userInfo.age) : "—"} />
-        <Separator backgroundColor={COLORS.border} />
-        <InfoRow label="Gender" value={userInfo.sex || "—"} />
-        <Separator backgroundColor={COLORS.border} />
-        <InfoRow label="Phone" value={userInfo.phone_number || "—"} />
-        <Separator backgroundColor={COLORS.border} />
-        <InfoRow label="Role" value={userInfo.role || "—"} />
-      </YStack>
-    )}
-  </Card>
-
-  <Card
-    bordered
-    elevate
-    backgroundColor={COLORS.card}
-    borderColor={COLORS.border}
-    padding="$4"
-    borderRadius="$8"
-    mt="$6"
-  >
-    <Text color={COLORS.subtext} fontWeight="800" fontSize="$3" mb="$2">
-      Slogan
-    </Text>
-    {isEditing ? (
-      <Input
-        value={draftSlogan}
-        onChangeText={setDraftSlogan}
-        backgroundColor="#fff"
-        borderRadius="$6"
-        placeholder="A short line that motivates you"
-      />
-    ) : (
-      <Paragraph color={COLORS.text} fontWeight="600">
-        {userInfo.slogan || "—"}
-      </Paragraph>
-    )}
-  </Card>
-
-  <Button
-    backgroundColor="#fff"
-    borderColor="rgba(239, 68, 68, 0.35)"
-    borderWidth={1}
-    color={COLORS.danger}
-    fontWeight="900"
-    onPress={onLogout}
-    borderRadius="$6"
-    mt="$6"
-  >
-    Log out
-  </Button>
-</YStack>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}

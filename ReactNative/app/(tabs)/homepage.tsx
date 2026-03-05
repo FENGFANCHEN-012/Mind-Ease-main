@@ -19,6 +19,7 @@ import {
     Text as TText,
     XStack,
     YStack,
+    Colors,
 } from "tamagui";
 import { useAppDispatch, useAppSelector } from "../../src/store/hooks";
 import { setMood } from "../../src/store/mindslice";
@@ -144,7 +145,7 @@ export default function Home() {
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <Card bordered backgroundColor={COLORS.card} borderColor={COLORS.border} padding="$4" mt="$4">
+        <Card bordered backgroundColor={COLORS.card} borderColor={COLORS.border} padding="$4" mt="$6">
           <XStack ai="center" jc="space-between" gap="$3">
             <YStack flex={1} gap="$2">
               <TText color={COLORS.subtext} fontWeight="700" fontSize="$3">
@@ -189,7 +190,6 @@ export default function Home() {
             borderColor="#FCA5A5"
             borderWidth={1}
             color={COLORS.danger}
-            fontWeight="900"
             onPress={async () => {
               dispatch(clearAuth());
               await SecureStore.deleteItemAsync("authToken");
@@ -197,12 +197,14 @@ export default function Home() {
               router.replace("/login");
             }}
           >
-            Logout
+            <TText color={COLORS.danger} fontWeight="900">
+              Logout
+            </TText>
           </Button>
         </XStack>
 
         {/* Wellness Score Card */}
-        <Card bordered backgroundColor={COLORS.card} borderColor="#EEF2F7" padding="$4" mt="$3">
+        <Card borderWidth={1} backgroundColor={COLORS.card} borderColor="#EEF2F7" padding="$4" mt="$3">
           <YStack gap="$2" mb="$3">
             <TText fontSize="$6" fontWeight="900" color={COLORS.text}>
               Today’s Wellness Score
@@ -279,11 +281,11 @@ export default function Home() {
                   backgroundColor="#F3FFF7"
                   borderColor="#DFF3E6"
                   borderWidth={1}
-                  color={COLORS.primary}
-                  fontWeight="900"
                   onPress={() => dispatch(setMood(5))}
                 >
-                  Quick Mood Boost
+                  <TText color={COLORS.primary} fontWeight="900">
+                    Quick Mood Boost
+                  </TText>
                 </Button>
               </YStack>
             </XStack>
@@ -441,7 +443,7 @@ export default function Home() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: COLORS.bg },
   screen: { flex: 1, backgroundColor: COLORS.bg },
-  content: { padding: 18, paddingTop: 28 },
+  content: { padding: 18, paddingTop: 40 },
 
   headerRow: { flexDirection: "row", alignItems: "center" },
   hi: { color: COLORS.subtext, fontWeight: "700" },

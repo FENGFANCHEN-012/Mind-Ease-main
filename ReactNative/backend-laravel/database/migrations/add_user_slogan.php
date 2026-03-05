@@ -9,32 +9,36 @@ return new class extends Migration
 {
     public function up(): void
     {
-       
-        Schema::table('profiles', function (Blueprint $table) {
-            $table->string('slogan')->nullable();
-        });
+        if (Schema::hasTable('profiles') && !Schema::hasColumn('profiles', 'slogan')) {
+            Schema::table('profiles', function (Blueprint $table) {
+                $table->string('slogan')->nullable();
+            });
+        }
 
-     
-        DB::table('profiles')->updateOrInsert(
-            ['user_id' => 1],
-            [
-                'location' => json_encode(['city' => 'New York', 'country' => 'USA']),
-                'goal' => 'Improve mental health',
-                'interests' => json_encode(['meditation', 'journaling']),
-                'language' => 'en',
-                'slogan' => 'Your mental health, our priority.',
-            ]
-        );
+        if (Schema::hasTable('profiles')) {
+            DB::table('profiles')->updateOrInsert(
+                ['user_id' => 1],
+                [
+                    'location' => json_encode(['city' => 'New York', 'country' => 'USA']),
+                    'goal' => 'Improve mental health',
+                    'interests' => json_encode(['meditation', 'journaling']),
+                    'language' => 'en',
+                    'slogan' => 'Your mental health, our priority.',
+                ]
+            );
+        }
     }
 
     public function down(): void
     {
-    
-        DB::table('profiles')->where('user_id', 1)->delete();
+        if (Schema::hasTable('profiles')) {
+            DB::table('profiles')->where('user_id', 1)->delete();
+        }
 
-       
-        Schema::table('profiles', function (Blueprint $table) {
-            $table->dropColumn('slogan');
-        });
+        if (Schema::hasTable('profiles') && Schema::hasColumn('profiles', 'slogan')) {
+            Schema::table('profiles', function (Blueprint $table) {
+                $table->dropColumn('slogan');
+            });
+        }
     }
 };
