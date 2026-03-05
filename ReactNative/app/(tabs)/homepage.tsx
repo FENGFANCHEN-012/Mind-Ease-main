@@ -9,17 +9,15 @@ import {
     SafeAreaView,
     ScrollView,
     StyleSheet,
-    Text,
-    View,
 } from "react-native";
 import {
     Button,
     Card,
     Paragraph as TParagraph,
     Text as TText,
+    View as TView,
     XStack,
     YStack,
-    Colors,
 } from "tamagui";
 import { useAppDispatch, useAppSelector } from "../../src/store/hooks";
 import { setMood } from "../../src/store/mindslice";
@@ -145,7 +143,7 @@ export default function Home() {
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <Card bordered backgroundColor={COLORS.card} borderColor={COLORS.border} padding="$4" mt="$6">
+        <Card borderWidth={1} backgroundColor={COLORS.card} borderColor={COLORS.border} padding="$4" mt="$6">
           <XStack ai="center" jc="space-between" gap="$3">
             <YStack flex={1} gap="$2">
               <TText color={COLORS.subtext} fontWeight="700" fontSize="$3">
@@ -189,7 +187,6 @@ export default function Home() {
             backgroundColor="#FEF2F2"
             borderColor="#FCA5A5"
             borderWidth={1}
-            color={COLORS.danger}
             onPress={async () => {
               dispatch(clearAuth());
               await SecureStore.deleteItemAsync("authToken");
@@ -293,74 +290,141 @@ export default function Home() {
         </Card>
 
         {/* Tasks */}
-        <View style={styles.card}>
-          <View style={[styles.cardHeaderRow, { marginBottom: 10 }]}>
-            <Text style={styles.cardTitle}>Today s Tasks</Text>
-            <View style={styles.pill}>
-              <Text style={styles.pillText}>
+        <Card borderWidth={1} backgroundColor={COLORS.card} borderColor="#EEF2F7" padding="$4" mt="$3">
+          <XStack ai="center" jc="space-between" mb="$3">
+            <TText fontSize="$6" fontWeight="900" color={COLORS.text}>
+              Today’s Tasks
+            </TText>
+            <YStack
+              backgroundColor={COLORS.primarySoft}
+              borderWidth={1}
+              borderColor="#CFF3DC"
+              px="$3"
+              py="$2"
+              borderRadius={999}
+            >
+              <TText color={COLORS.primary} fontWeight="900" fontSize="$2">
                 {tasks.filter((t) => t.done).length}/{tasks.length} completed
-              </Text>
-            </View>
-          </View>
+              </TText>
+            </YStack>
+          </XStack>
 
-          {tasks.map((t) => (
-            <View key={t.id} style={styles.taskRow}>
-              <View style={[styles.taskIcon, t.done ? styles.taskIconDone : null]}>
-                <Text style={styles.taskIconText}>{t.done ? "✓" : "⏰"}</Text>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.taskTitle}>{t.title}</Text>
-                <Text style={styles.taskTime}>{t.time}</Text>
-              </View>
-              <View style={[styles.checkBox, t.done && styles.checkBoxOn]}>
-                {t.done ? <Text style={styles.checkMark}>✓</Text> : null}
-              </View>
-            </View>
-          ))}
-        </View>
+          <YStack>
+            {tasks.map((t, idx) => (
+              <YStack key={t.id}>
+                {idx !== 0 ? <YStack height={1} backgroundColor="#F0F3F7" /> : null}
+                <XStack ai="center" jc="space-between" py="$3" gap="$3">
+                  <YStack
+                    width={34}
+                    height={34}
+                    borderRadius={10}
+                    backgroundColor={t.done ? COLORS.primarySoft : "#F2F4F7"}
+                    ai="center"
+                    jc="center"
+                  >
+                    <TText fontWeight="900" color={COLORS.text}>
+                      {t.done ? "✓" : "⏰"}
+                    </TText>
+                  </YStack>
+
+                  <YStack flex={1}>
+                    <TText fontWeight="900" color={COLORS.text}>
+                      {t.title}
+                    </TText>
+                    <TText mt="$1" color={COLORS.subtext} fontWeight="600" fontSize="$2">
+                      {t.time}
+                    </TText>
+                  </YStack>
+
+                  <YStack
+                    width={22}
+                    height={22}
+                    borderRadius={6}
+                    borderWidth={2}
+                    borderColor={t.done ? COLORS.primary : "#D1D5DB"}
+                    backgroundColor={t.done ? COLORS.primary : "transparent"}
+                    ai="center"
+                    jc="center"
+                  >
+                    {t.done ? (
+                      <TText color="#fff" fontWeight="900" fontSize="$3">
+                        ✓
+                      </TText>
+                    ) : null}
+                  </YStack>
+                </XStack>
+              </YStack>
+            ))}
+          </YStack>
+        </Card>
 
         {/* Sleep */}
-        <View style={styles.card}>
-          <View style={styles.cardHeaderRow}>
-            <Text style={styles.cardTitle}>Sleep Analysis</Text>
-            <Text style={styles.cardLink}>{sleep.note}</Text>
-          </View>
+        <Card borderWidth={1} backgroundColor={COLORS.card} borderColor="#EEF2F7" padding="$4" mt="$3">
+          <XStack ai="center" jc="space-between" mb="$2">
+            <TText fontSize="$6" fontWeight="900" color={COLORS.text}>
+              Sleep Analysis
+            </TText>
+            <TText color={COLORS.subtext} fontWeight="800">
+              {sleep.note}
+            </TText>
+          </XStack>
 
-          <View style={styles.sleepTop}>
-            <Text style={styles.sleepBig}>{sleep.total}</Text>
-            <Text style={styles.sleepSub}>Last Night</Text>
-          </View>
+          <XStack ai="baseline" gap="$2" mt="$1">
+            <TText fontSize="$7" fontWeight="900" color={COLORS.text}>
+              {sleep.total}
+            </TText>
+            <TText color={COLORS.subtext} fontWeight="700">
+              Last Night
+            </TText>
+          </XStack>
 
-          <View style={styles.sleepGrid}>
-            <View style={styles.sleepMiniCard}>
-              <Text style={styles.miniVal}>{sleep.deep}</Text>
-              <Text style={styles.miniLabel}>Deep Sleep</Text>
-            </View>
-            <View style={styles.sleepMiniCard}>
-              <Text style={styles.miniVal}>{sleep.quality}</Text>
-              <Text style={styles.miniLabel}>Sleep Efficiency</Text>
-            </View>
-            <View style={styles.sleepMiniCard}>
-              <Text style={styles.miniVal}>{sleep.breath}</Text>
-              <Text style={styles.miniLabel}>Breath/min</Text>
-            </View>
-            <View style={styles.sleepMiniCard}>
-              <Text style={styles.miniVal}>{sleep.hr}</Text>
-              <Text style={styles.miniLabel}>Avg Heart Rate</Text>
-            </View>
-          </View>
+          <XStack flexWrap="wrap" gap="$3" mt="$3">
+            {[
+              { v: sleep.deep, l: "Deep Sleep" },
+              { v: sleep.quality, l: "Sleep Efficiency" },
+              { v: sleep.breath, l: "Breath/min" },
+              { v: sleep.hr, l: "Avg Heart Rate" },
+            ].map((m) => (
+              <YStack
+                key={m.l}
+                width="48%"
+                backgroundColor="#F6F7FA"
+                borderWidth={1}
+                borderColor="#EEF2F7"
+                borderRadius={14}
+                padding="$3"
+              >
+                <TText fontWeight="900" color={COLORS.text}>
+                  {m.v}
+                </TText>
+                <TText mt="$2" color={COLORS.subtext} fontWeight="700" fontSize="$2">
+                  {m.l}
+                </TText>
+              </YStack>
+            ))}
+          </XStack>
 
-          <Pressable style={styles.outlineBtn}>
-            <Text style={styles.outlineBtnText}>View Detail Analysis</Text>
-          </Pressable>
-        </View>
+          <Button
+            mt="$4"
+            backgroundColor="#fff"
+            borderWidth={1}
+            borderColor="#DFF3E6"
+            borderRadius={14}
+          >
+            <TText color={COLORS.primary} fontWeight="900">
+              View Detail Analysis
+            </TText>
+          </Button>
+        </Card>
 
         {/* Stress Tools */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Stress Out Tools</Text>
+        <Card borderWidth={1} backgroundColor={COLORS.card} borderColor="#EEF2F7" padding="$4" mt="$3">
+          <TText fontSize="$6" fontWeight="900" color={COLORS.text}>
+            Stress Tools
+          </TText>
 
           {/* segmented tabs */}
-          <View style={styles.segment}>
+          <TView style={styles.segment}>
             {PRACTICE_ORDER.map((p) => {
               const active = selectedPractice === p;
               return (
@@ -369,72 +433,143 @@ export default function Home() {
                   onPress={() => setSelectedPractice(p)}
                   style={[styles.segmentItem, active && styles.segmentItemOn]}
                 >
-                  <Text style={[styles.segmentText, active && styles.segmentTextOn]}>
+                  <TText style={[styles.segmentText, active && styles.segmentTextOn]}>
                     {practiceLabel(p)}
-                  </Text>
+                  </TText>
                 </Pressable>
               );
             })}
-          </View>
+          </TView>
 
           {/* practice banner (fake image block) */}
-          <View style={styles.practiceBanner}>
-            <View style={styles.bannerOverlay}>
-              <Text style={styles.bannerTitle}>{practiceTitle(selectedPractice)}</Text>
-              <Text style={styles.bannerDesc}>{practiceDesc(selectedPractice)}</Text>
-            </View>
-          </View>
+          <TView style={styles.practiceBanner}>
+            <TView style={styles.bannerOverlay}>
+              <TText style={styles.bannerTitle}>{practiceTitle(selectedPractice)}</TText>
+              <TText style={styles.bannerDesc}>{practiceDesc(selectedPractice)}</TText>
+            </TView>
+          </TView>
 
           {/* settings rows */}
-          <View style={styles.settingRow}>
-            <Text style={styles.settingLabel}>Session Duration</Text>
-            <View style={styles.settingValuePill}>
-              <Text style={styles.settingValue}>20 Min</Text>
-            </View>
-          </View>
-          <View style={styles.settingRow}>
-            <Text style={styles.settingLabel}>Difficulty Level</Text>
-            <View style={styles.settingValuePill}>
-              <Text style={styles.settingValue}>High</Text>
-            </View>
-          </View>
+          <XStack ai="center" jc="space-between" mt="$3">
+            <TText color={COLORS.subtext} fontWeight="800">
+              Session Duration
+            </TText>
+            <YStack
+              backgroundColor={COLORS.primarySoft}
+              borderWidth={1}
+              borderColor="#CFF3DC"
+              px="$3"
+              py="$2"
+              borderRadius={999}
+            >
+              <TText color={COLORS.primary} fontWeight="900" fontSize="$2">
+                20 Min
+              </TText>
+            </YStack>
+          </XStack>
+
+          <XStack ai="center" jc="space-between" mt="$3">
+            <TText color={COLORS.subtext} fontWeight="800">
+              Difficulty Level
+            </TText>
+            <YStack
+              backgroundColor={COLORS.primarySoft}
+              borderWidth={1}
+              borderColor="#CFF3DC"
+              px="$3"
+              py="$2"
+              borderRadius={999}
+            >
+              <TText color={COLORS.primary} fontWeight="900" fontSize="$2">
+                High
+              </TText>
+            </YStack>
+          </XStack>
 
           {/* Spotify */}
-          <View style={styles.spotifyCard}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.spotifyTitle}>Background Music</Text>
-              <Text style={styles.spotifySub}>Go to Spotify To Find Out More Music</Text>
-            </View>
-            <View style={styles.spotifyBadge}>
-              <Text style={styles.spotifyBadgeText}>Spotify</Text>
-            </View>
-          </View>
+          <XStack
+            mt="$4"
+            ai="center"
+            jc="space-between"
+            gap="$3"
+            backgroundColor="#0B1220"
+            borderRadius={16}
+            padding="$3"
+          >
+            <YStack flex={1} gap="$1">
+              <TText color="#fff" fontWeight="900">
+                Background Music
+              </TText>
+              <TText color="#CBD5E1" fontWeight="600" fontSize="$2">
+                Go to Spotify to find more calming tracks
+              </TText>
+            </YStack>
+            <YStack backgroundColor="#1DB954" px="$3" py="$2" borderRadius={999}>
+              <TText color="#06210F" fontWeight="900" fontSize="$2">
+                Spotify
+              </TText>
+            </YStack>
+          </XStack>
 
-          <Pressable
-            style={styles.primaryBtn}
+          <Button
+            mt="$4"
+            backgroundColor={COLORS.primary}
+            borderRadius={16}
             onPress={() => router.push("./")}
           >
-            <Text style={styles.primaryBtnText}>{practiceButton(selectedPractice)}</Text>
-          </Pressable>
+            <TText color="#fff" fontWeight="900">
+              {practiceButton(selectedPractice)}
+            </TText>
+          </Button>
 
-          <Pressable onPress={nextPractice} style={styles.nextBtn}>
-            <Text style={styles.nextBtnText}>Next ›</Text>
-          </Pressable>
-        </View>
+          <Button
+            mt="$3"
+            backgroundColor="#fff"
+            borderWidth={1}
+            borderColor="#EEF2F7"
+            borderRadius={16}
+            onPress={nextPractice}
+          >
+            <TText color={COLORS.subtext} fontWeight="900">
+              Next ›
+            </TText>
+          </Button>
+        </Card>
 
         {/* AI Chat */}
-        <Pressable style={styles.aiCard} onPress={() => router.push("/chatbot")}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.aiTitle}>Feeling stressed?</Text>
-            <Text style={styles.aiSub}>Chat with our AI and feel better in minutes.</Text>
-            <View style={styles.aiBtn}>
-              <Text style={styles.aiBtnText}>Start AI Chat</Text>
-            </View>
-          </View>
-          <Text style={styles.aiEmoji}>🤖</Text>
+        <Pressable onPress={() => router.push("/chatbot")}
+        >
+          <Card borderWidth={1} backgroundColor={COLORS.card} borderColor="#EEF2F7" padding="$4" mt="$3">
+            <XStack ai="center" jc="space-between" gap="$3">
+              <YStack flex={1} gap="$2">
+                <TText fontSize="$6" fontWeight="900" color={COLORS.text}>
+                  Feeling stressed?
+                </TText>
+                <TParagraph color={COLORS.subtext} fontWeight="600">
+                  Chat with our AI and feel better in minutes.
+                </TParagraph>
+                <YStack
+                  mt="$2"
+                  alignSelf="flex-start"
+                  backgroundColor={COLORS.primarySoft}
+                  borderWidth={1}
+                  borderColor="#CFF3DC"
+                  px="$3"
+                  py="$2"
+                  borderRadius={999}
+                >
+                  <TText color={COLORS.primary} fontWeight="900" fontSize="$2">
+                    Start AI Chat
+                  </TText>
+                </YStack>
+              </YStack>
+
+              <TText fontSize="$10">🤖</TText>
+            </XStack>
+          </Card>
         </Pressable>
 
-        <View style={{ height: 28 }} />
+        <YStack height={28} />
       </ScrollView>
     </SafeAreaView>
   );
