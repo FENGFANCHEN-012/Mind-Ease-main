@@ -12,6 +12,14 @@ import {
     Text,
     View,
 } from "react-native";
+import {
+    Button,
+    Card,
+    Paragraph as TParagraph,
+    Text as TText,
+    XStack,
+    YStack,
+} from "tamagui";
 import { useAppDispatch, useAppSelector } from "../../src/store/hooks";
 import { setMood } from "../../src/store/mindslice";
 
@@ -136,91 +144,151 @@ export default function Home() {
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <View style={styles.headerRow}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.hi}>Good Morning,</Text>
-            <Text style={styles.name}>{userName ? userName : "Friend"}!</Text>
+        <Card bordered backgroundColor={COLORS.card} borderColor={COLORS.border} padding="$4" mt="$4">
+          <XStack ai="center" jc="space-between" gap="$3">
+            <YStack flex={1} gap="$2">
+              <TText color={COLORS.subtext} fontWeight="700" fontSize="$3">
+                Good Morning,
+              </TText>
+              <TText color={COLORS.text} fontWeight="900" fontSize="$8" lineHeight="$8">
+                {userName ? userName : "Friend"}!
+              </TText>
 
-            <View style={styles.statusPill}>
-              <View style={styles.dotOnline} />
-              <Text style={styles.statusText}>Watch Connected</Text>
-            </View>
-          </View>
+              <XStack
+                ai="center"
+                gap="$2"
+                alignSelf="flex-start"
+                backgroundColor={COLORS.primarySoft}
+                borderColor="#CFF3DC"
+                borderWidth={1}
+                px="$3"
+                py="$2"
+                borderRadius={999}
+              >
+                <YStack width={8} height={8} borderRadius={99} backgroundColor={COLORS.primary} />
+                <TText color={COLORS.primary} fontWeight="800" fontSize="$2">
+                  Watch Connected
+                </TText>
+              </XStack>
+            </YStack>
 
-          <Pressable onPress={() => router.push("./profile")} style={styles.avatarWrap}>
-            <Image source={{ uri: "https://i.pravatar.cc/150" }} style={styles.avatar} />
-          </Pressable>
-        </View>
+            <Pressable onPress={() => router.push("./profile")} style={styles.avatarWrap}>
+              <Image source={{ uri: "https://i.pravatar.cc/150" }} style={styles.avatar} />
+            </Pressable>
+          </XStack>
+        </Card>
 
         {/* Small row: mood + logout */}
-        <View style={styles.rowBetween}>
-          <Text style={styles.smallHint}>Current mood: {mood ?? "none"}</Text>
-          <Pressable
+        <XStack ai="center" jc="space-between" mt="$3" mb="$2">
+          <TParagraph color={COLORS.subtext} fontWeight="700">
+            Current mood: {mood ?? "none"}
+          </TParagraph>
+          <Button
+            size="$3"
+            backgroundColor="#FEF2F2"
+            borderColor="#FCA5A5"
+            borderWidth={1}
+            color={COLORS.danger}
+            fontWeight="900"
             onPress={async () => {
               dispatch(clearAuth());
               await SecureStore.deleteItemAsync("authToken");
               await SecureStore.deleteItemAsync("userId");
               router.replace("/login");
             }}
-            style={styles.logoutBtn}
           >
-            <Text style={styles.logoutText}>Logout</Text>
-          </Pressable>
-        </View>
+            Logout
+          </Button>
+        </XStack>
 
         {/* Wellness Score Card */}
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <Text style={styles.cardTitle}>Today s Wellness Score</Text>
-            <Text style={styles.cardSub}>You are a good today! Keep it up!</Text>
-          </View>
+        <Card bordered backgroundColor={COLORS.card} borderColor="#EEF2F7" padding="$4" mt="$3">
+          <YStack gap="$2" mb="$3">
+            <TText fontSize="$6" fontWeight="900" color={COLORS.text}>
+              Today’s Wellness Score
+            </TText>
+            <TParagraph color={COLORS.subtext} fontWeight="600">
+              Breathe in. Breathe out. You’re doing great.
+            </TParagraph>
+          </YStack>
 
-          <View style={styles.wellnessRow}>
-            {/* Weekly bars */}
-            <View style={{ flex: 1, paddingRight: 14 }}>
-              <Text style={styles.sectionLabel}>Weekly Wellness Levels</Text>
-              <View style={styles.barsRow}>
-                {weekly.map((v, i) => {
-                  const h = Math.round((v / maxWeekly) * 54);
-                  const isToday = i === 5;
-                  return (
-                    <View key={i} style={styles.barItem}>
-                      <View
-                        style={[
-                          styles.bar,
-                          { height: h },
-                          isToday && { backgroundColor: COLORS.primary },
-                        ]}
-                      />
-                      <Text style={styles.barLabel}>
-                        {["Mon", "Tues", "Thur", "Fri", "Sat", "Sun", ""][i] ?? ""}
-                      </Text>
-                    </View>
-                  );
-                })}
-              </View>
-            </View>
+          <YStack>
+            <XStack ai="flex-start">
+              {/* Weekly bars */}
+              <YStack flex={1} pr="$3">
+                <TText color={COLORS.subtext} fontWeight="800" fontSize="$2" mb="$2">
+                  Weekly Wellness Levels
+                </TText>
+                <YStack>
+                  <XStack ai="flex-end" jc="space-between">
+                    {weekly.map((v, i) => {
+                      const h = Math.round((v / maxWeekly) * 54);
+                      const isToday = i === 5;
+                      return (
+                        <YStack key={i} ai="center" width={22}>
+                          <YStack
+                            width={10}
+                            height={h}
+                            borderRadius={999}
+                            backgroundColor={isToday ? COLORS.primary : "#BFEFD0"}
+                          />
+                          <TText mt="$2" fontSize="$1" color={COLORS.subtext} fontWeight="700">
+                            {["Mon", "Tues", "Thur", "Fri", "Sat", "Sun", ""][i] ?? ""}
+                          </TText>
+                        </YStack>
+                      );
+                    })}
+                  </XStack>
+                </YStack>
+              </YStack>
 
-            {/* Score ring */}
-            <View style={styles.scoreWrap}>
-              <View style={styles.scoreRingOuter}>
-                <View style={styles.scoreRingInner}>
-                  <Text style={styles.scoreNum}>{wellnessScore}</Text>
-                </View>
-              </View>
-              <View style={styles.scoreTrack}>
-                <View style={[styles.scoreFill, { width: `${progress}%` }]} />
-              </View>
+              {/* Score ring */}
+              <YStack width={128} ai="center">
+                <YStack
+                  width={84}
+                  height={84}
+                  borderRadius={42}
+                  borderWidth={10}
+                  borderColor="#D1FAE5"
+                  ai="center"
+                  jc="center"
+                >
+                  <YStack
+                    width={58}
+                    height={58}
+                    borderRadius={29}
+                    backgroundColor="#F7FFFA"
+                    ai="center"
+                    jc="center"
+                    borderWidth={1}
+                    borderColor="#E7F6EC"
+                  >
+                    <TText fontSize="$7" fontWeight="900" color={COLORS.primary}>
+                      {wellnessScore}
+                    </TText>
+                  </YStack>
+                </YStack>
 
-              <Pressable
-                onPress={() => dispatch(setMood(5))}
-                style={styles.ghostBtn}
-              >
-                <Text style={styles.ghostBtnText}>Quick Mood Boost</Text>
-              </Pressable>
-            </View>
-          </View>
-        </View>
+                <YStack mt="$3" width="100%" height={8} borderRadius={99} backgroundColor="#EEF2F7" overflow="hidden">
+                  <YStack height="100%" width={`${progress}%`} backgroundColor={COLORS.primary} />
+                </YStack>
+
+                <Button
+                  mt="$3"
+                  size="$3"
+                  backgroundColor="#F3FFF7"
+                  borderColor="#DFF3E6"
+                  borderWidth={1}
+                  color={COLORS.primary}
+                  fontWeight="900"
+                  onPress={() => dispatch(setMood(5))}
+                >
+                  Quick Mood Boost
+                </Button>
+              </YStack>
+            </XStack>
+          </YStack>
+        </Card>
 
         {/* Tasks */}
         <View style={styles.card}>
@@ -373,7 +441,7 @@ export default function Home() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: COLORS.bg },
   screen: { flex: 1, backgroundColor: COLORS.bg },
-  content: { padding: 18, paddingTop: 14 },
+  content: { padding: 18, paddingTop: 28 },
 
   headerRow: { flexDirection: "row", alignItems: "center" },
   hi: { color: COLORS.subtext, fontWeight: "700" },

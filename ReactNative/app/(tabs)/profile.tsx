@@ -244,8 +244,24 @@ export default function Profile() {
         }}
       >
         <YStack flex={1} jc="center" ai="center">
-          <YStack width="100%" maxWidth={460} gap="$4" mt="$6">
-            <Card bordered backgroundColor={COLORS.card} borderColor={COLORS.border} padding="$4">
+          <YStack width="100%" maxWidth={460} gap="$4" mt="$8">
+            <YStack gap="$1" px="$1">
+              <Text color={COLORS.subtext} fontWeight="800" fontSize="$3">
+                Your space
+              </Text>
+              <Text color={COLORS.text} fontWeight="900" fontSize="$8" lineHeight="$8">
+                Profile
+              </Text>
+            </YStack>
+
+            <Card
+              bordered
+              elevate
+              backgroundColor={COLORS.card}
+              borderColor={COLORS.border}
+              padding="$4"
+              borderRadius="$8"
+            >
               <XStack ai="center" jc="space-between" gap="$3">
                 <XStack ai="center" gap="$3" flex={1}>
                   <YStack
@@ -282,6 +298,7 @@ export default function Profile() {
                   fontWeight="800"
                   onPress={refreshUserInfo}
                   disabled={isRefreshing}
+                  borderRadius="$6"
                 >
                   {isRefreshing ? "Refreshing" : "Refresh"}
                 </Button>
@@ -289,9 +306,9 @@ export default function Profile() {
             </Card>
 
             <XStack ai="center" jc="space-between">
-              <Text color={COLORS.text} fontWeight="800" fontSize="$5">
-                Profile
-              </Text>
+              <Paragraph color={COLORS.subtext} fontWeight="700">
+                Keep it simple. Update only what you want.
+              </Paragraph>
               <XStack gap="$2">
                 <Button
                   size="$3"
@@ -301,6 +318,7 @@ export default function Profile() {
                   color={isEditing ? COLORS.subtext : COLORS.primary}
                   fontWeight="800"
                   onPress={onToggleEdit}
+                  borderRadius="$6"
                 >
                   {isEditing ? "Cancel" : "Edit"}
                 </Button>
@@ -315,6 +333,7 @@ export default function Profile() {
                     fontWeight="800"
                     onPress={onSave}
                     disabled={isSaving}
+                    borderRadius="$6"
                   >
                     {isSaving ? "Saving" : "Save"}
                   </Button>
@@ -322,7 +341,14 @@ export default function Profile() {
               </XStack>
             </XStack>
 
-            <Card bordered backgroundColor={COLORS.card} borderColor={COLORS.border} padding="$4">
+            <Card
+              bordered
+              elevate
+              backgroundColor={COLORS.card}
+              borderColor={COLORS.border}
+              padding="$4"
+              borderRadius="$8"
+            >
               <InfoRow label="User ID" value={userInfo.id ? String(userInfo.id) : "—"} />
               <Separator backgroundColor={COLORS.border} />
 
@@ -332,28 +358,54 @@ export default function Profile() {
                     <Text color={COLORS.subtext} fontWeight="700" fontSize="$3">
                       Name
                     </Text>
-                    <Input value={draftName} onChangeText={setDraftName} backgroundColor="#fff" />
+                    <Input
+                      value={draftName}
+                      onChangeText={setDraftName}
+                      backgroundColor="#fff"
+                      borderRadius="$6"
+                      placeholder="Your name"
+                    />
                   </YStack>
 
                   <YStack gap="$2">
                     <Text color={COLORS.subtext} fontWeight="700" fontSize="$3">
                       Gender
                     </Text>
-                    <Input value={draftSex} onChangeText={setDraftSex} backgroundColor="#fff" />
+                    <Input
+                      value={draftSex}
+                      onChangeText={setDraftSex}
+                      backgroundColor="#fff"
+                      borderRadius="$6"
+                      placeholder="e.g. female / male"
+                    />
                   </YStack>
 
                   <YStack gap="$2">
                     <Text color={COLORS.subtext} fontWeight="700" fontSize="$3">
                       Age
                     </Text>
-                    <Input value={draftAge} onChangeText={setDraftAge} keyboardType="number-pad" backgroundColor="#fff" />
+                    <Input
+                      value={draftAge}
+                      onChangeText={setDraftAge}
+                      keyboardType="number-pad"
+                      backgroundColor="#fff"
+                      borderRadius="$6"
+                      placeholder="e.g. 21"
+                    />
                   </YStack>
 
                   <YStack gap="$2">
                     <Text color={COLORS.subtext} fontWeight="700" fontSize="$3">
                       Phone
                     </Text>
-                    <Input value={draftPhone} onChangeText={setDraftPhone} keyboardType="phone-pad" backgroundColor="#fff" />
+                    <Input
+                      value={draftPhone}
+                      onChangeText={setDraftPhone}
+                      keyboardType="phone-pad"
+                      backgroundColor="#fff"
+                      borderRadius="$6"
+                      placeholder="Optional"
+                    />
                   </YStack>
                 </YStack>
               ) : (
@@ -369,12 +421,25 @@ export default function Profile() {
               )}
             </Card>
 
-            <Card bordered backgroundColor={COLORS.card} borderColor={COLORS.border} padding="$4">
+            <Card
+              bordered
+              elevate
+              backgroundColor={COLORS.card}
+              borderColor={COLORS.border}
+              padding="$4"
+              borderRadius="$8"
+            >
               <Text color={COLORS.subtext} fontWeight="800" fontSize="$3" mb="$2">
                 Slogan
               </Text>
               {isEditing ? (
-                <Input value={draftSlogan} onChangeText={setDraftSlogan} backgroundColor="#fff" />
+                <Input
+                  value={draftSlogan}
+                  onChangeText={setDraftSlogan}
+                  backgroundColor="#fff"
+                  borderRadius="$6"
+                  placeholder="A short line that motivates you"
+                />
               ) : (
                 <Paragraph color={COLORS.text} fontWeight="600">
                   {userInfo.slogan || "—"}
@@ -384,17 +449,191 @@ export default function Profile() {
 
             <Button
               backgroundColor="#fff"
-              borderColor="rgba(239, 68, 68, 0.35)"
-              borderWidth={1}
-              color={COLORS.danger}
-              fontWeight="900"
-              onPress={onLogout}
-            >
-              Log out
-            </Button>
-          </YStack>
         </YStack>
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
+
+        <YStack flex={1} gap="$1">
+          <Text color={COLORS.text} fontSize="$6" fontWeight="800" numberOfLines={1}>
+            {displayName}
+          </Text>
+          <Paragraph color={COLORS.subtext} numberOfLines={1}>
+            {displayEmail}
+          </Paragraph>
+        </YStack>
+      </XStack>
+
+      <Button
+        size="$3"
+        backgroundColor={COLORS.primarySoft}
+        borderColor="rgba(45, 190, 96, 0.25)"
+        borderWidth={1}
+        color={COLORS.primary}
+        fontWeight="800"
+        onPress={refreshUserInfo}
+        disabled={isRefreshing}
+        borderRadius="$6"
+      >
+        {isRefreshing ? "Refreshing" : "Refresh"}
+      </Button>
+    </XStack>
+  </Card>
+
+  <XStack ai="center" jc="space-between" mt="$6">
+    <Paragraph color={COLORS.subtext} fontWeight="700" fontSize="$3">
+      Keep it simple. Update only what you want.
+    </Paragraph>
+    <XStack gap="$2">
+      <Button
+        size="$3"
+        backgroundColor={isEditing ? "#FFFFFF" : COLORS.primarySoft}
+        borderColor={isEditing ? COLORS.border : "rgba(45, 190, 96, 0.25)"}
+        borderWidth={1}
+        color={isEditing ? COLORS.subtext : COLORS.primary}
+        fontWeight="800"
+        onPress={onToggleEdit}
+        borderRadius="$6"
+      >
+        {isEditing ? "Cancel" : "Edit"}
+      </Button>
+
+      {isEditing ? (
+        <Button
+          size="$3"
+          backgroundColor={COLORS.primary}
+          borderColor={COLORS.primary}
+          borderWidth={1}
+          color="#fff"
+          fontWeight="800"
+          onPress={onSave}
+          disabled={isSaving}
+          borderRadius="$6"
+        >
+          {isSaving ? "Saving" : "Save"}
+        </Button>
+      ) : null}
+    </XStack>
+  </XStack>
+
+  <Card
+    bordered
+    elevate
+    backgroundColor={COLORS.card}
+    borderColor={COLORS.border}
+    padding="$4"
+    borderRadius="$8"
+    mt="$6"
+  >
+    <Text color={COLORS.subtext} fontWeight="800" fontSize="$3" mb="$2">
+      Profile
+    </Text>
+    <InfoRow label="User ID" value={userInfo.id ? String(userInfo.id) : "—"} />
+    <Separator backgroundColor={COLORS.border} />
+
+    {isEditing ? (
+      <YStack gap="$3" py="$3">
+        <YStack gap="$2">
+          <Text color={COLORS.subtext} fontWeight="700" fontSize="$3">
+            Name
+          </Text>
+          <Input
+            value={draftName}
+            onChangeText={setDraftName}
+            backgroundColor="#fff"
+            borderRadius="$6"
+            placeholder="Your name"
+          />
+        </YStack>
+
+        <YStack gap="$2">
+          <Text color={COLORS.subtext} fontWeight="700" fontSize="$3">
+            Gender
+          </Text>
+          <Input
+            value={draftSex}
+            onChangeText={setDraftSex}
+            backgroundColor="#fff"
+            borderRadius="$6"
+            placeholder="e.g. female / male"
+          />
+        </YStack>
+
+        <YStack gap="$2">
+          <Text color={COLORS.subtext} fontWeight="700" fontSize="$3">
+            Age
+          </Text>
+          <Input
+            value={draftAge}
+            onChangeText={setDraftAge}
+            keyboardType="number-pad"
+            backgroundColor="#fff"
+            borderRadius="$6"
+            placeholder="e.g. 21"
+          />
+        </YStack>
+
+        <YStack gap="$2">
+          <Text color={COLORS.subtext} fontWeight="700" fontSize="$3">
+            Phone
+          </Text>
+          <Input
+            value={draftPhone}
+            onChangeText={setDraftPhone}
+            keyboardType="phone-pad"
+            backgroundColor="#fff"
+            borderRadius="$6"
+            placeholder="Optional"
+          />
+        </YStack>
+      </YStack>
+    ) : (
+      <YStack>
+        <InfoRow label="Age" value={userInfo.age !== null ? String(userInfo.age) : "—"} />
+        <Separator backgroundColor={COLORS.border} />
+        <InfoRow label="Gender" value={userInfo.sex || "—"} />
+        <Separator backgroundColor={COLORS.border} />
+        <InfoRow label="Phone" value={userInfo.phone_number || "—"} />
+        <Separator backgroundColor={COLORS.border} />
+        <InfoRow label="Role" value={userInfo.role || "—"} />
+      </YStack>
+    )}
+  </Card>
+
+  <Card
+    bordered
+    elevate
+    backgroundColor={COLORS.card}
+    borderColor={COLORS.border}
+    padding="$4"
+    borderRadius="$8"
+    mt="$6"
+  >
+    <Text color={COLORS.subtext} fontWeight="800" fontSize="$3" mb="$2">
+      Slogan
+    </Text>
+    {isEditing ? (
+      <Input
+        value={draftSlogan}
+        onChangeText={setDraftSlogan}
+        backgroundColor="#fff"
+        borderRadius="$6"
+        placeholder="A short line that motivates you"
+      />
+    ) : (
+      <Paragraph color={COLORS.text} fontWeight="600">
+        {userInfo.slogan || "—"}
+      </Paragraph>
+    )}
+  </Card>
+
+  <Button
+    backgroundColor="#fff"
+    borderColor="rgba(239, 68, 68, 0.35)"
+    borderWidth={1}
+    color={COLORS.danger}
+    fontWeight="900"
+    onPress={onLogout}
+    borderRadius="$6"
+    mt="$6"
+  >
+    Log out
+  </Button>
+</YStack>
